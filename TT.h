@@ -13,7 +13,7 @@
 using namespace std;
 class TT {
 public:
-    //BST();
+    TT();
 
     void contains() const;
 
@@ -25,25 +25,63 @@ public:
 
 private:
     struct node {
-        node(const string &x, node *l, node * m, node *r)
-                : key(x), left(l),middle(m), right(r) {
-            lines.resize(0);
+        node(const string &x, const string &y, node *l, node * m, node *r, node* p)
+        : keyL(x), keyR(x), left(l),middle(m), right(r), parent(p)
+        {
+            linesL.resize(0);
+            linesR.resize(0);
         }
 
-        string key;
+        string keyL;
+        string keyR;
         node *left;
-        node* middle;
+        node *middle;
         node *right;
-        vector<int> lines;
+        node *parent;
+        
+        vector<int> linesL;
+        vector<int> linesR;
+        
+        void swap(node* R)
+        {
+            keyL.swap(R->keyL);
+            keyR.swap(R->keyR);
+            
+            auto* swap = left;
+            //swap left
+            left = R->left;
+            R->left = swap;
+            //swap middle
+            swap = middle;
+            middle = R->middle;
+            R->middle = swap;
+            //swap right
+            swap = right;
+            right = R->right;
+            R->right = swap;
+            //swap parent
+            swap = parent;
+            parent = R->parent;
+            R->parent = swap ;
+            
+            linesL.swap(R->linesL);
+            linesR.swap(R->linesR);
+        }
     };
 
     node *root;
+    
+    static node* promoteNode;
+    static node *oldNewChild;
+    static node *oldNewChildLeftSib;
 
     void insertHelper(const string &X, int line, node *&t, int &distWords);
 
     bool containsHelper(const string &x, node *t, node *&result) const;
 
     void printTreeHelper(node *t, ostream &out) const;
+    
+    void promoteHelper(node* t);
 
     int findHeight(node *t);
 // 2-3 tree node (complete)
