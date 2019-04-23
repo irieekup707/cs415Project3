@@ -25,8 +25,8 @@ public:
 
 private:
     struct node {
-        node(const string &x, const string &y, node *l, node * m, node *r, node* p)
-        : keyL(x), keyR(x), left(l),middle(m), right(r), parent(p)
+        node(const string &x = "", const string &y = "", node *l = NULL, node * m = NULL, node *r = NULL, node* p = NULL)
+        : keyL(x), keyR(y), left(l),middle(m), right(r), parent(p)
         {
             linesL.resize(0);
             linesR.resize(0);

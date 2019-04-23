@@ -14,7 +14,6 @@ using namespace std;
 TT::TT()
 {
     root = NULL;
-    promoteNode = new node("", "", NULL, NULL, NULL, NULL);
     oldNewChild = NULL;
     oldNewChildLeftSib = NULL;
 }
@@ -338,33 +337,43 @@ void TT::promoteHelper(node* t)
     
     if (promoteNode->keyL < t->keyL)
     {//less than left
-        t->swap(promoteNode);
+        (t->left)->swap(promoteNode);
     }
     else if(promoteNode->keyL > t->keyR)
     {//greater than right
-        t->swap(promoteNode);
+        (t->right)->swap(promoteNode);
     }
     //if middle, nothing needs to be done
     
-    newChild.swap(t);
-    newChild.swap(t);
+    newChild = *promoteNode;
+    newChild = *promoteNode;
     
     
     
     if ((t->parent)->keyR == "")
     {//there's room for simple promotion to existing parent
-        (t->parent)->keyR = promoteNode->keyL;
-        (t->parent)->linesR = promoteNode->linesL;
+        if (t == (t->parent)->left)
+        {
+            (t->parent)->right = (t->parent)->middle;
+            (t->parent)->middle = &newChild;
+        }
+        else //t == (t->parent)->middle
+        {
+            (t->parent)->right = &newChild;
+        }
+        //t == (t->parent)->right NOT POSSIBLE with keyR == ""
+        //regardless, newChild's parent is t's parent
+        newChild.parent = t->parent;
     }
     else if(t->parent)
     {
         promoteHelper(t->parent);
     }
     else
-    {
-        
-        auto newRoot = new node(promoteKey, "", t, newChild, NULL, t);
-        newRoot->linesL = promoteLines;
+    {//we're splitting the root
+        static node newRoot = *promoteNode;
+        newRoot.left = t;
+        newRoot.middle = &newChild;
     }
 }
 
