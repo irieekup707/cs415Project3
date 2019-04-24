@@ -14,8 +14,6 @@ using namespace std;
 TT::TT()
 {
     root = NULL;
-    oldNewChild = NULL;
-    oldNewChildLeftSib = NULL;
 }
 
 //Returns true if there are no nodes in the tree
@@ -185,192 +183,175 @@ void TT::printTreeHelper(node *t, ostream & out) const{
     }
 }
 
-void TT::promoteHelper(node* t)
+void TT::promoteHelper(node* t, node* last_t, node* last_sib)
 {
-    static node newChild("", "", NULL, NULL, NULL, NULL);
-    if (oldNewChild)
+    if (last_sib)
     {//if this is a recursive call
-        if (oldNewChildLeftSib == t->left)
+        if (last_t == t->left)
         {//previous call was on a left
             /*
-                            t              newChild
-                           ___               ___
-                          |___|             |___|
-                         /    |\
-                        /     | \
-                       /      |  \
-                      /       |   \
-                  ___/  ___   |__  \___
-                 |___| |___| |___| |___|
-                  old   old   t->m  t->r
-                  Sib   New
-                (t->l) Child
-                                      __
-                                     |  |
-                                     |  |
-                                   __|  |__
-                                   \  TO  /
-                                    \    /
-                                     \  /
-                                      \/
-             
-                            t                newChild
-                           ___                 ___
-                          |___|               |___|
-                         /    |               |    \
-                        /     |               |     \
-                       /      |               |      \
-                      /       |               |       \
-                  ___/       _|_           ___|        \___
-                 |___|      |___|         |___|        |___|
-                  old        old           t->m         t->r
-                  Sib        New
-                (t->l)      Child
+             t               pNode
+             ___               ___
+             |___|             |___|
+             /    |\
+             /     | \
+             /      |  \
+             /       |   \
+             ___/  ___   |__  \___
+             |___| |___| |___| |___|
+             t->l last_p  t->m  t->r
+             last_t
+             __
+             |  |
+             |  |
+             __|  |__
+             \  TO  /
+             \    /
+             \  /
+             \/
+             t                 pNode
+             ___                 ___
+             |___|               |___|
+             /    |               |    \
+             /     |               |     \
+             /      |               |      \
+             /       |               |       \
+             ___/       _|_           ___|        \___
+             |___|      |___|         |___|        |___|
+             t->l      last_p          t->m         t->r
+             last_t
              */
-            //move t's middle to newChild's left
-            newChild.left = t->middle;
-            newChild.left->parent = &newChild;
-            //oldNewChild becomes t's new middle
-            t->middle = oldNewChild;
-            t->middle->parent = t;
-            //t's right becomes newChild's middle
-            newChild.middle = t->right;
-            newChild.middle->parent = &newChild;
+            //move t's middle to pNode's left
+            pNode->left = t->middle;
+            pNode->left->parent = pNode;
+            //last_p becomes t's new middle
+            t->middle = last_sib;
+            last_sib->parent = t;
+            //t's right becomes pNode's middle
+            pNode->middle = t->right;
+            pNode->middle->parent = pNode;
         }
-        else if (oldNewChildLeftSib == t->right)
+        else if (last_t == t->right)
         {//previous call was on a right
             /*
-                            t              newChild
-                           ___               ___
-                          |___|             |___|
-                         /|    \
-                        / |     \
-                       /  |      \
-                      /   |       \
-                  ___/  __|   ___  \___
-                 |___| |___| |___| |___|
-                 t->l   old   old  t->r
-                        Sib   New
-                      (t->m) Child
-                                      __
-                                     |  |
-                                     |  |
-                                   __|  |__
-                                   \  TO  /
-                                    \    /
-                                     \  /
-                                      \/
-             
-                            t                newChild
-                           ___                 ___
-                          |___|               |___|
-                         /    |               |    \
-                        /     |               |     \
-                       /      |               |      \
-                      /       |               |       \
-                  ___/       _|_           ___|        \___
-                 |___|      |___|         |___|        |___|
-                  t->l       old           old         t->r
-                             Sib           New
-                            (t->m)        Child
+             t               pNode
+             ___               ___
+             |___|             |___|
+             /|    \
+             / |     \
+             /  |      \
+             /   |       \
+             ___/  __|   ___  \___
+             |___| |___| |___| |___|
+             t->l  t->m  last_p t->r
+             last_t
+             __
+             |  |
+             |  |
+             __|  |__
+             \  TO  /
+             \    /
+             \  /
+             \/
+             t                 pNode
+             ___                 ___
+             |___|               |___|
+             /    |               |    \
+             /     |               |     \
+             /      |               |      \
+             /       |               |       \
+             ___/       _|_           ___|        \___
+             |___|      |___|         |___|        |___|
+             t->l       t->m        last_p         t->r
+             last_t
              */
-            //move t's right to newChild's middle
-            newChild.middle = t->right;
-            newChild.middle->parent = &newChild;
-            //oldNewChild becomes newChild's left
-            newChild.left = oldNewChild;
-            newChild.left->parent = &newChild;
+            //move t's right to pNode's middle
+            pNode->middle = t->right;
+            pNode->middle->parent = pNode;
+            //last_t becomes pNode's left
+            pNode->left = last_sib;
+            last_sib->parent = pNode;
         }
         else
         {//previous call was on a middle
             /*
-                            t              newChild
-                           ___               ___
-                          |___|             |___|
-                         / |  |
-                        /  |  |
-                       /   |  |
-                      /    |  |
-                  ___/  ___|  |__   ___
-                 |___| |___| |___| |___|
-                 t->l  t->m   old   old
-                              Sib   New
-                            (t->r) Child
-                                      __
-                                     |  |
-                                     |  |
-                                   __|  |__
-                                   \  TO  /
-                                    \    /
-                                     \  /
-                                      \/
+             t               pNode
+             ___               ___
+             |___|             |___|
+             / |  |
+             /  |  |
+             /   |  |
+             /    |  |
+             ___/  ___|  |__   ___
+             |___| |___| |___| |___|
+             t->l  t->m  t->r  last_p
+             last_t
+             __
+             |  |
+             |  |
+             __|  |__
+             \  TO  /
+             \    /
+             \  /
+             \/
              
-                            t                newChild
-                           ___                 ___
-                          |___|               |___|
-                         /    |               |    \
-                        /     |               |     \
-                       /      |               |      \
-                      /       |               |       \
-                  ___/       _|_           ___|        \___
-                 |___|      |___|         |___|        |___|
-                 t->l       t->m           old          old
-                                           Sib          New
-                                          (t->r)       Child
+             t                 pNode
+             ___                 ___
+             |___|               |___|
+             /    |               |    \
+             /     |               |     \
+             /      |               |      \
+             /       |               |       \
+             ___/       _|_           ___|        \___
+             |___|      |___|         |___|        |___|
+             t->l       t->m          t->r         last_p
+             last_t
              */
-            //move t's right to newChild's left
-            newChild.left = t->right;
-            newChild.left->parent = &newChild;
-            //oldNewChild becomes newChild's middle
-            newChild.middle = oldNewChild;
-            newChild.middle->parent = &newChild;
+            //move t's right to pNode's left
+            pNode->left = t->right;
+            pNode->left->parent = pNode;
+            //last_p becomes pNode's middle
+            pNode->middle = last_sib;
+            last_sib->parent = pNode;
             
         }
         //in all cases, t is left with no right child
         t->right = NULL;
     }
+    //make new sibling
+    node* sibling = new node();
     
-    
-    //set previous pointers for next recursive call
-    oldNewChild = &newChild;
-    oldNewChildLeftSib = t;
-    
-    if (promoteNode->keyL < t->keyL)
-    {//less than left
-        (t->left)->swap(promoteNode);
+    if (pNode->keyL < t->keyL)
+    {//less than left, current left is mid-key
+        (t->keyL).swap(pNode->keyL);
+        (t->linesL).swap(pNode->linesL);
     }
-    else if(promoteNode->keyL > t->keyR)
-    {//greater than right
-        (t->right)->swap(promoteNode);
+    else if(pNode->keyL > t->keyR)
+    {//greater than right, current right is mid-key
+        t->keyR.swap(pNode->keyL);
+        t->linesR.swap(pNode->linesL);
     }
-    //if middle, nothing needs to be done
-    
-    newChild = *promoteNode;
+    //now t->keyL < pNode->keyL < t->keyR
+    (t->keyR).swap(sibling->keyL);
+    (t->linesR).swap(sibling->linesL);
     
     if ((t->parent)->keyR == "")
     {//there's room for simple promotion to existing parent
-        if (t == (t->parent)->left)
-        {
-            (t->parent)->right = (t->parent)->middle;
-            (t->parent)->middle = &newChild;
-        }
-        else //t == (t->parent)->middle
-        {
-            (t->parent)->right = &newChild;
-        }
+        t->keyR = pNode->keyL;
+        t->linesR = pNode->linesL;
         //t == (t->parent)->right NOT POSSIBLE with keyR == ""
-        //regardless, newChild's parent is t's parent
-        newChild.parent = t->parent;
+        //regardless, pNode's parent is t's parent
+        pNode->parent = t->parent;
     }
     else if(t->parent)
     {
-        promoteHelper(t->parent);
+        promoteHelper(t->parent, t, sibling);
     }
     else
     {//we're splitting the root
-        static node newRoot = *promoteNode;
+        static node newRoot = *pNode;
         newRoot.left = t;
-        newRoot.middle = &newChild;
+        newRoot.middle = sibling;
     }
 }
 
