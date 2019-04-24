@@ -114,6 +114,15 @@ void TT::buildTree(ifstream & input){
     
 }
 
+bool TT::isLeaf(node *t)
+{
+    if(t->left == NULL && t->middle == NULL && t->right == NULL)
+    {
+        return true;
+    } else
+        return false;
+}
+
 //x is the word to insert, line is the line in the text file
 //the word was found at, node is the node of the tree being
 //examined, and distWord is incremented if a new word is created
