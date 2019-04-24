@@ -81,6 +81,8 @@ private:
     
     void promoteHelper(node* t, node* last_t = NULL, node* last_sib = NULL);
 
+    bool isLeaf(node *t);
+    
     int findHeight(node *t);
 // 2-3 tree node (complete)
 /*template <class elemType>
