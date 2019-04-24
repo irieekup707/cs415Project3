@@ -10,10 +10,13 @@
 
 using namespace std;
 
+TT::node* TT::pNode = NULL;
+
 //Constructor
 TT::TT()
 {
     root = NULL;
+    
 }
 
 //Returns true if there are no nodes in the tree
@@ -138,6 +141,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         }
         else
         {
+            pNode = new node("x");
             promoteHelper(t);
         }
     }
@@ -360,7 +364,13 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
     (t->keyR).swap(sibling->keyL);
     (t->linesR).swap(sibling->linesL);
     
-    if ((t->parent)->keyR == "")
+    if (!t->parent)
+    {//we're splitting the root
+        static node newRoot = *pNode;
+        newRoot.left = t;
+        newRoot.middle = sibling;
+    }
+    else if (t->parent->keyR == "")
     {//there's room for simple promotion to existing parent
         t->keyR = pNode->keyL;
         t->linesR = pNode->linesL;
@@ -368,15 +378,9 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
         //regardless, pNode's parent is t's parent
         pNode->parent = t->parent;
     }
-    else if(t->parent)
-    {
-        promoteHelper(t->parent, t, sibling);
-    }
     else
-    {//we're splitting the root
-        static node newRoot = *pNode;
-        newRoot.left = t;
-        newRoot.middle = sibling;
+    {//complicated promotion
+        promoteHelper(t->parent, t, sibling);
     }
 }
 

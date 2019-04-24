@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include "bst.h"
+#include "TT.h"
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -16,6 +17,9 @@ int main(int argc, char* argv[]) {
 
     ifstream input(argv[1]);
     BST myTree;
+    TT ttTree;
+
+    ttTree.buildTree(input);
 
     if(input.is_open()){
         myTree.buildTree(input);
