@@ -1,244 +1,414 @@
 //
 // Created by Ryan  Martino on 4/21/19.
 //
+//
+// Created by Ryan  Martino on 4/21/19.
+//
 #include"TT.h"
+#include "time.h"
 #include<iostream>
 #include<vector>
-#include<iomanip>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
-/*
-//check if a node is leaf
-template <class elemType>
-bool TT<elemType> :: isLeaf(nodeType<elemType>* n) const{
-    //pre: a node pointer
-    //post: return boolean of whether the node has no children at all
-    return (n->left == NULL && n->right == NULL && n->middle == NULL);
+
+//Constructor
+TT::TT()
+{
+    root = NULL;
+    oldNewChild = NULL;
+    oldNewChildLeftSib = NULL;
 }
 
-//print out a node's value(s)
-template <class elemType>
-void TT<elemType> :: printNode(nodeType<elemType>* n) const{
-    //pre: a node pointer
-    //post: output the node's data item(s)
-    if (n!= NULL){  //print guard
-        if (n->numData == 1) cout << n->dataLeft << " ";
-        else cout << n->dataLeft << " " << n->dataRight << " ";
+//Returns true if there are no nodes in the tree
+bool TT::isEmpty(){
+    return root == NULL;
+}
+
+//Used to implement the search function in the main
+//program.
+void TT::contains() const{
+    string input;
+    node *foundNode = NULL;
+    cout << "Search word: ";
+    cin >> input;
+    if(containsHelper(input, root, foundNode))
+    {
+        vector<int>* lines;
+        if (input == foundNode->keyL)
+        {
+            lines = &foundNode->linesL;
+        }
+        else
+        {
+            lines = &foundNode->linesR;
+        }
+        cout << "Line Numbers: " << (*lines)[0];
+        for(int i = 1; i < (*lines).size(); i++)
+        {
+            cout << ", " << (*lines)[i];
+        }
+        cout << '\n';
+    }
+    else
+        cout << '\"' << input <<"\" is not in the document\n";
+}
+
+//Prints the index to the supplied receiver, either
+//cout or the output file
+void TT::printTree(ostream & out) const {
+    out << "Binary Search Tree Index:\n-------------------------\n";
+    printTreeHelper(root, out);
+}
+
+//Receives the specified input file and constructs
+//the actual tree. Prints a message when finished.
+void TT::buildTree(ifstream & input){
+    int line = 1, numWords = 0, distWords = 0, treeHeight = 0;
+    stringstream tempWord;
+    double totalTime, finishTime, startTime = clock();
+    while (!input.eof()) {
+        string tempLine, tempWord;
+
+        //Read a whole line of text from the file
+        getline(input, tempLine);
+        for (int i = 0; i < tempLine.length(); i++) {
+            //Insert valid chars into tempWord until a delimiter( newline or space) is found
+            while (tempLine[i] != ' '&& tempLine[i] != '\n' && i < tempLine.length() ) {
+                tempWord.insert(tempWord.end(), tempLine[i]);
+                i++;
+            }
+
+            //Trim any punctuation off end of word. Will leave things like apostrophes
+            //and decimal points
+            while(tempWord.length() > 0 && !isalnum(tempWord[tempWord.length() - 1]))
+                tempWord.resize(tempWord.size() -1);
+
+            if (tempWord.length() > 0)
+            {
+                //Once word is formatted,call insert with the word, the line of the input
+                //file it came from, the root of our tree, and the distinct word counter
+                insertHelper(tempWord, line, root, distWords);
+                //Increment our total number of words inserted
+                numWords++;
+                //Clear out tempWord so we can use it again
+                tempWord.clear();
+            }
+
+        }
+        line++;
+    }
+    //Do time and height calculation
+    finishTime = clock();
+    totalTime = (double) (finishTime - startTime)/CLOCKS_PER_SEC;
+    treeHeight = findHeight(root);
+
+    //Print output
+    cout << setw(40) << std::left;
+    cout << "Total number of words: " << numWords<< endl;
+
+    cout << setw(40) << std::left
+         << "Total number of distinct words: " << distWords << endl;
+
+    cout << setw(40) << std::left
+         <<"Total time spent building index: " << totalTime << endl;
+
+    cout << setw(40) << std::left
+         <<"Height of TT is : " << treeHeight << endl;
+
+}
+
+
+bool TT::isLeaf(node *t)
+{
+    if(t->left == NULL && t->middle == NULL && t->right == NULL)
+    {
+        return true;
+    } else
+        return false;
+}
+
+
+
+//x is the word to insert, line is the line in the text file
+//the word was found at, node is the node of the tree being
+//examined, and distWord is incremented if a new word is created
+//and used by buildTree
+void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
+    if(t == NULL)
+    {
+        t = new node(x, "", NULL, NULL, NULL, NULL);
+        t->linesL.push_back(line);
+        distWord++;
+    }
+    else if(isLeaf(t))
+    {
+        if(t->keyR == "")
+        {
+            t->keyR = x;
+        }else
+        promoteHelper(t);
+    }
+    else
+    {
+        if (x.compare(t->keyL) == 0)
+        {
+            t->linesL.push_back(line);
+        }
+        else if (x.compare(t->keyR) == 0)
+        {
+            t->linesR.push_back(line);
+        }
+        else if (x < t->keyL)
+        {
+            insertHelper(x, line, t->left, distWord);
+        }
+        else if (x > t->keyR)
+        {
+            insertHelper(x, line, t->right, distWord);
+        }
+        else
+        {
+            insertHelper(x, line, t->middle, distWord);
+        }
     }
 }
 
-//print all nodes' values in the tree form
-template <class elemType>
-void TT<elemType> :: display() const{
-    //pre: none
-    //post: output the tree's values, in the form of their original hierarchies
-    if (root == NULL) cout << "Empty tree.";    //print guard
+//Used by contains() to see if a words is present or not. Will
+//give contains() a pointer to the found node so that contains()
+//can prints the lines the word was found on.
+bool TT::containsHelper(const string & x, node * t, node * &result) const{
+    if (t == NULL)
+        return false;
+    if ((t->keyL.compare(x) == 0)||(t->keyL.compare(x) == 0)){
+        result = t;
+        return true;
+    }
+    else if (x < t->keyL)
+        return containsHelper(x, t->left, result);
+    else if (x > t-> keyR)
+        return containsHelper(x, t->right, result);
+    else
+        return containsHelper(x, t->middle, result);
+}
+
+//Called by printTree(), does the actual formatted printing
+void TT::printTreeHelper(node *t, ostream & out) const{
+    if(t == NULL)
+        return;
     else {
-        vector<nodeType<elemType>*> v;  //list to print
-        vector<nodeType<elemType>*> c;  //list to hold children of v, for later use
-        v.push_back(root);  //first level
-        while (!v.empty()){
-            for (int i = 0; i< v.size(); i++){  //print all nodes
-                cout << setw(3); printNode(v[i]); cout << ", ";
-            }
-            cout << endl;   //end this level
-            for (int i = 0; i < v.size(); i++){ //find children of nodes in v
-                if(v[i]->left) c.push_back(v[i]->left);
-                if(v[i]->middle) c.push_back(v[i]->middle);
-                if(v[i]->right) c.push_back(v[i]->right);
-            }
-            v.clear(); v.swap(c); c.clear();    //clear v, make children print-ready
+        printTreeHelper(t->left, out);
+        out << setw(30) << std::left;
+        out << t->keyL << " " << t->linesL[0];
+        for (int i = 1; i < t->linesL.size(); i++)
+            out << ", " << t->linesL[i];
+        out << endl;
+        printTreeHelper(t->right, out);
+    }
+}
+
+void TT::promoteHelper(node* t)
+{
+    static node newChild("", "", NULL, NULL, NULL, NULL);
+    if (oldNewChild)
+    {//if this is a recursive call
+        if (oldNewChildLeftSib == t->left)
+        {//previous call was on a left
+            /*
+                            t              newChild
+                           ___               ___
+                          |___|             |___|
+                         /    |\
+                        /     | \
+                       /      |  \
+                      /       |   \
+                  ___/  ___   |__  \___
+                 |___| |___| |___| |___|
+                  old   old   t->m  t->r
+                  Sib   New
+                (t->l) Child
+                                      __
+                                     |  |
+                                     |  |
+                                   __|  |__
+                                   \  TO  /
+                                    \    /
+                                     \  /
+                                      \/
+
+                            t                newChild
+                           ___                 ___
+                          |___|               |___|
+                         /    |               |    \
+                        /     |               |     \
+                       /      |               |      \
+                      /       |               |       \
+                  ___/       _|_           ___|        \___
+                 |___|      |___|         |___|        |___|
+                  old        old           t->m         t->r
+                  Sib        New
+                (t->l)      Child
+             */
+            //move t's middle to newChild's left
+            newChild.left = t->middle;
+            newChild.left->parent = &newChild;
+            //oldNewChild becomes t's new middle
+            t->middle = oldNewChild;
+            t->middle->parent = t;
+            //t's right becomes newChild's middle
+            newChild.middle = t->right;
+            newChild.middle->parent = &newChild;
         }
-    }
-    cout << endl;
-}
+        else if (oldNewChildLeftSib == t->right)
+        {//previous call was on a right
+            /*
+                            t              newChild
+                           ___               ___
+                          |___|             |___|
+                         /|    \
+                        / |     \
+                       /  |      \
+                      /   |       \
+                  ___/  __|   ___  \___
+                 |___| |___| |___| |___|
+                 t->l   old   old  t->r
+                        Sib   New
+                      (t->m) Child
+                                      __
+                                     |  |
+                                     |  |
+                                   __|  |__
+                                   \  TO  /
+                                    \    /
+                                     \  /
+                                      \/
 
-//output the inorder traversal of the tree
-template <class elemType>
-void TT<elemType> :: doInorder(nodeType<elemType>* n) const{
-    //pre: a node pointer; function will do inorder starting from this node; recursively
-    //post: an output of the inorder traversal result
-    //left, parent, right
-    if (root == NULL){  //print guard
-        cout << "Empty tree." << endl;
-    } else if (isLeaf(n)){    //the base case; if n is leaf
-        printNode(n);
-    } else {
-        doInorder(n->left);  //inorder left child
-        cout << n->dataLeft << " ";  //parent left data
-        if (n->middle){
-            doInorder(n->middle);    //inorder middle child
-            cout << n->dataRight << " "; //parent right data
+                            t                newChild
+                           ___                 ___
+                          |___|               |___|
+                         /    |               |    \
+                        /     |               |     \
+                       /      |               |      \
+                      /       |               |       \
+                  ___/       _|_           ___|        \___
+                 |___|      |___|         |___|        |___|
+                  t->l       old           old         t->r
+                             Sib           New
+                            (t->m)        Child
+             */
+            //move t's right to newChild's middle
+            newChild.middle = t->right;
+            newChild.middle->parent = &newChild;
+            //oldNewChild becomes newChild's left
+            newChild.left = oldNewChild;
+            newChild.left->parent = &newChild;
         }
-        doInorder(n->right); //inorder right child
-    }
-}
+        else
+        {//previous call was on a middle
+            /*
+                            t              newChild
+                           ___               ___
+                          |___|             |___|
+                         / |  |
+                        /  |  |
+                       /   |  |
+                      /    |  |
+                  ___/  ___|  |__   ___
+                 |___| |___| |___| |___|
+                 t->l  t->m   old   old
+                              Sib   New
+                            (t->r) Child
+                                      __
+                                     |  |
+                                     |  |
+                                   __|  |__
+                                   \  TO  /
+                                    \    /
+                                     \  /
+                                      \/
 
-//create a new node, initialize all crucial values
-template <class elemType>
-nodeType<elemType>* TT<elemType> :: instantiate(const elemType x){
-    //pre: the initial value the node holds
-    //post: a pointer to the newly created node
-    nodeType<elemType> *node = new nodeType<elemType>;
-    node->dataLeft = x;
-    node->numData = 1;
-    node->left = node->middle = node->right = node->parent = NULL;
-    return node;
-}
+                            t                newChild
+                           ___                 ___
+                          |___|               |___|
+                         /    |               |    \
+                        /     |               |     \
+                       /      |               |      \
+                      /       |               |       \
+                  ___/       _|_           ___|        \___
+                 |___|      |___|         |___|        |___|
+                 t->l       t->m           old          old
+                                           Sib          New
+                                          (t->r)       Child
+             */
+            //move t's right to newChild's left
+            newChild.left = t->right;
+            newChild.left->parent = &newChild;
+            //oldNewChild becomes newChild's middle
+            newChild.middle = oldNewChild;
+            newChild.middle->parent = &newChild;
 
-//insert an item to the tree
-template <class elemType>
-void TT<elemType> :: insert(const elemType x){
-    //pre: the value to insert to the tree
-    //post: value is inserted
-    //if empty tree
-    if (root == NULL){
-        root = instantiate(x);
-        //if has only 1 node
-    } else if (isLeaf(root)){
-        if (root->numData == 1){    //if it's a 2-node
-            insertSecondItem(root, x);
-        } else {    //it's a 3-node
-            root = splitNode(root, instantiate(x), 0);
         }
-        //other conditions
-    } else {
-        auxilary(root, x);
+        //in all cases, t is left with no right child
+        t->right = NULL;
     }
-}
 
-//sort the three elements passed in
-template <class elemType>
-elemType* TT<elemType> :: promote(const elemType m, const elemType n, const elemType x){
-    //pre: the three elements; m, n should be old node's values, x should be new value
-    //post: a pointer to the sorted array
-    elemType* middle = new elemType[3];
-    if (x < m){ //m is the median
-        middle[0] = x; middle[1] = m; middle[2] = n;
-    } else if (x > n){  //n is the median
-        middle[0] = m; middle[1] = n; middle[2] = x;
-    } else{ //x is the median
-        middle[0] = m; middle[1] = x; middle[2] = n;
-    } return middle;
-}
 
-//split the node passed in
-template <class elemType>
-nodeType<elemType>* TT<elemType> :: splitNode(nodeType<elemType>* n, nodeType<elemType>* x, const int pos){
-    //pre: a pointer to the node to split, the node that causes the split, and where the split causer comes from (left, middle, right = 0, 1, 2)
-    //post: a pointer to the top-most node of manipulated subtree
-    nodeType<elemType>* nodeCache[4];    //cache children of nodes passed in
-    //rearrange the position of these children for later hook up
-    if (pos == 0){   //x left, x right, n middle, n right
-        nodeCache[0] = x->left; nodeCache[1] = x->right;
-        nodeCache[2] = n->middle; nodeCache[3] = n->right;
-    } else if (pos == 2){   //n left, n middle, x left, x right
-        nodeCache[0] = n->left; nodeCache[1] = n->middle;
-        nodeCache[2] = x->left; nodeCache[3] = x->right;
-    } else {    //n left, x left, x right, n right
-        nodeCache[0] = n->left; nodeCache[1] = x->left;
-        nodeCache[2] = x->right; nodeCache[3] = n->right;
+    //set previous pointers for next recursive call
+    oldNewChild = &newChild;
+    oldNewChildLeftSib = t;
+
+    if (promoteNode->keyL < t->keyL)
+    {//less than left
+        (t->left)->swap(promoteNode);
     }
-    elemType *middle = promote(n->dataLeft, n->dataRight, x->dataLeft); //sort the passed nodes' values
-    //reuse nodes to prevent memory leak
-    nodeType<elemType> *promo = instantiate(middle[1]);   //new promoted node
-    nodeType<elemType> *l = instantiate(middle[0]); //left child
-    nodeType<elemType> *r = instantiate(middle[2]); //right child
-    //parental relationship of first relative level
-    promo->left = l; promo->right = r;
-    l->parent = promo; r->parent = promo;
-    //parental relationship of second relative level; hook up cached nodes
-    if (nodeCache[0] != NULL){
-        l->left = nodeCache[0]; l->right = nodeCache[1];
-        nodeCache[0]->parent = nodeCache[1]->parent = l;
-        r->left = nodeCache[2]; r->right = nodeCache[3];
-        nodeCache[2]->parent = nodeCache[3]->parent = r;
+    else if(promoteNode->keyL > t->keyR)
+    {//greater than right
+        (t->right)->swap(promoteNode);
     }
-    return promo;
-}
+    //if middle, nothing needs to be done
 
-//insert a new item to a 2-node
-template <class elemType>
-void TT<elemType> :: insertSecondItem(nodeType<elemType>* n, const elemType x){
-    //pre: a pointer to the 2-node, and the value to be inserted
-    //post: value is inserted
-    if (x < n->dataLeft){   //x should be on left
-        n->dataRight = n->dataLeft;
-        n->dataLeft = x;
-    } else {    //x should be on right
-        n->dataRight = x;
-    } n->numData = 2;
-}
+    newChild = *promoteNode;
+    newChild = *promoteNode;
 
-//check if the node is parent's left, middle or right child
-template <class elemType>
-int TT<elemType> :: posChild(const nodeType<elemType>*parento, const nodeType<elemType>*n) const{
-    //pre: a pointer to the parent, and a pointer to the node itself
-    //post: return 0 for left, 1 for middle, 2 for right child
-    if (parento->left == n) return 0;    //if left child
-    else if (parento->middle == n) return 1; //if middle child
-    else return 2;  //if right child
-}
 
-//recursive helper function for insert()
-template <class elemType>
-void TT<elemType> :: auxilary(nodeType<elemType> * n, const elemType x){
-    //pre: a pointer to the node to start with, the value to insert
-    //post: value is inserted to the tree
-    if (isLeaf(n)){ //base case; if n is a leaf
-        if (n->numData == 1){   //leaf has empty space
-            insertSecondItem(n, x);
-        } else {    //leaf is full; split it; promote the node to parent
-            int pos = posChild(n->parent, n);
-            nodeType<elemType> *promo = splitNode(n, instantiate(x), pos);  //split the node
-            while (n->parent != root){    //if parent is not root
-                if (n->parent->numData == 1){ //the parent is not full
-                    insertSecondItem(n->parent, promo->dataLeft);   //insert value to parent
-                    //rearrange leftover's linking
-                    int pos = posChild(n->parent, n);
-                    if (pos == 0){ //if n is left child
-                        n->parent->left = promo->left;
-                        n->parent->middle = promo->right;
-                    } else if (pos == 2){   //if n is right child
-                        n->parent->middle = promo->left;
-                        n->parent->right = promo->right;
-                    }
-                    promo->left->parent = promo->right->parent = n->parent;
-                    break;  //insertion complete
-                } else {    //continue to split parent's parent and so on
-                    pos = posChild(n->parent, n);   //direction the split request comes from
-                    n = n->parent;  //go one level up
-                    promo = splitNode(n, promo, pos);   //split parent's parent
-                }
-            }
-            if (n->parent == root){ //when trace to root
-                pos = posChild(n->parent, n);   //direction the split request comes from
-                if (n->parent->numData == 1){   //the root is not full
-                    insertSecondItem(n->parent, promo->dataLeft);
-                    if (pos == 0){ //if n is left child
-                        n->parent->left = promo->left;
-                        n->parent->middle = promo->right;
-                    } else if (pos == 2){   //if n is right child
-                        n->parent->middle = promo->left;
-                        n->parent->right = promo->right;
-                    }
-                    promo->left->parent = promo->right->parent = n->parent;
-                } else {    //split the root
-                    pos = posChild(n->parent, n);
-                    n = n->parent;
-                    root = splitNode(n, promo, pos);    //root will be updated
-                }
-            }
+
+    if ((t->parent)->keyR == "")
+    {//there's room for simple promotion to existing parent
+        if (t == (t->parent)->left)
+        {
+            (t->parent)->right = (t->parent)->middle;
+            (t->parent)->middle = &newChild;
         }
-    } else {    //non-base case
-        if (n->numData == 1){   //2-node
-            if (x < n->dataLeft) auxilary(n->left, x);  //go left subtree
-            else auxilary(n->right, x);   //go right subtree
-        } else {    //3-node
-            if (x < n->dataLeft) auxilary(n->left, x);  //go left subtree
-            else if (x > n->dataRight) auxilary(n->right, x);  //go left subtree
-            else auxilary(n->middle, x);    //go middle subtree
+        else //t == (t->parent)->middle
+        {
+            (t->parent)->right = &newChild;
         }
+        //t == (t->parent)->right NOT POSSIBLE with keyR == ""
+        //regardless, newChild's parent is t's parent
+        newChild.parent = t->parent;
+    }
+    else if(t->parent)
+    {
+        promoteHelper(t->parent);
+    }
+    else
+    {//we're splitting the root
+        static node newRoot = *promoteNode;
+        newRoot.left = t;
+        newRoot.middle = &newChild;
     }
 }
-*/
+
+//Returns height of tree. If tree has only one node, height is 1
+int TT::findHeight(node *t){
+    if(t == NULL)
+        return 0;
+    else{
+        int leftHeight = findHeight(t->left), rightHeight = findHeight(t->right);
+        if(leftHeight > rightHeight)
+            return(leftHeight+1);
+        else
+            return(rightHeight+1);
+    }
+}

@@ -7,6 +7,7 @@ CMakeFiles/cs415Project3.dir/TT.cpp.o: ../TT.h
 CMakeFiles/cs415Project3.dir/bst.cpp.o: ../bst.cpp
 CMakeFiles/cs415Project3.dir/bst.cpp.o: ../bst.h
 
+CMakeFiles/cs415Project3.dir/main.cpp.o: ../TT.h
 CMakeFiles/cs415Project3.dir/main.cpp.o: ../bst.h
 CMakeFiles/cs415Project3.dir/main.cpp.o: ../main.cpp
 
