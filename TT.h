@@ -71,9 +71,9 @@ private:
 
     node *root;
     
-    static node* promoteNode;
-    static node *oldNewChild;
-    static node *oldNewChildLeftSib;
+    static node* pNode;
+    //static node *oldNewChild;
+    //static node *oldNewChildLeftSib;
 
     void insertHelper(const string &X, int line, node *&t, int &distWords);
 
@@ -81,7 +81,7 @@ private:
 
     void printTreeHelper(node *t, ostream &out) const;
     
-    void promoteHelper(node* t);
+    void promoteHelper(node* t, node* last_p = NULL, node* last_t = NULL);
 
     int findHeight(node *t);
 // 2-3 tree node (complete)

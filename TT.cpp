@@ -346,9 +346,6 @@ void TT::promoteHelper(node* t)
     //if middle, nothing needs to be done
     
     newChild = *promoteNode;
-    newChild = *promoteNode;
-    
-    
     
     if ((t->parent)->keyR == "")
     {//there's room for simple promotion to existing parent
