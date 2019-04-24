@@ -197,6 +197,14 @@ void TT::printTreeHelper(node *t, ostream & out) const{
         for (int i = 1; i < t->lines.size(); i++)
             out << ", " << t->lines[i];
         out << endl;
+
+        printTreeHelper(t->middle, out);
+        out << setw(30) << std::left;
+        out << t->keyL << " " << t->linesL[0];
+        for (int i = 1; i < t->linesL.size(); i++)
+            out << ", " << t->linesL[i];
+        out << endl;
+
         printTreeHelper(t->right, out);
     }
 }
