@@ -116,11 +116,7 @@ void TT::buildTree(ifstream & input){
 
 bool TT::isLeaf(node *t)
 {
-    if(t->left == NULL && t->middle == NULL && t->right == NULL)
-    {
-        return true;
-    } else
-        return false;
+    return (t->left == NULL && t->middle == NULL);
 }
 
 //x is the word to insert, line is the line in the text file
@@ -139,8 +135,11 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         if(t->keyR == "")
         {
             t->keyR = x;
-        }else
+        }
+        else
+        {
             promoteHelper(t);
+        }
     }
     else
     {
@@ -193,16 +192,16 @@ void TT::printTreeHelper(node *t, ostream & out) const{
     else {
         printTreeHelper(t->left, out);
         out << setw(30) << std::left;
-        out << t->key << " " << t->lines[0];
-        for (int i = 1; i < t->lines.size(); i++)
-            out << ", " << t->lines[i];
+        out << t->keyL << " " << t->linesL[0];
+        for (int i = 1; i < t->linesL.size(); i++)
+            out << ", " << t->linesL[i];
         out << endl;
 
         printTreeHelper(t->middle, out);
         out << setw(30) << std::left;
-        out << t->keyL << " " << t->linesL[0];
-        for (int i = 1; i < t->linesL.size(); i++)
-            out << ", " << t->linesL[i];
+        out << t->keyR << " " << t->linesR[0];
+        for (int i = 1; i < t->linesR.size(); i++)
+            out << ", " << t->linesR[i];
         out << endl;
 
         printTreeHelper(t->right, out);
