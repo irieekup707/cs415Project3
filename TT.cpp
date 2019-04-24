@@ -121,9 +121,17 @@ void TT::buildTree(ifstream & input){
 void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
     if(t == NULL)
     {
-        t = new node(x, "", NULL, NULL, NULL, t);
+        t = new node(x, "", NULL, NULL, NULL, NULL);
         t->linesL.push_back(line);
         distWord++;
+    }
+    else if(isLeaf(t))
+    {
+        if(t->keyR == "")
+        {
+            t->keyR = x;
+        }else
+            promoteHelper(t);
     }
     else
     {
@@ -149,6 +157,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         }
     }
 }
+
 
 //Used by contains() to see if a words is present or not. Will
 //give contains() a pointer to the found node so that contains()
