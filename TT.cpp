@@ -190,35 +190,35 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
         if (last_t == t->left)
         {//previous call was on a left
             /*
-             t               pNode
-             ___               ___
-             |___|             |___|
-             /    |\
-             /     | \
-             /      |  \
-             /       |   \
-             ___/  ___   |__  \___
+                        t               pNode
+                       ___               ___
+                      |___|             |___|
+                     /    |\
+                    /     | \
+                   /      |  \
+                  /       |   \
+              ___/  ___   |__  \___
              |___| |___| |___| |___|
              t->l last_p  t->m  t->r
-             last_t
-             __
-             |  |
-             |  |
-             __|  |__
-             \  TO  /
-             \    /
-             \  /
-             \/
-             t                 pNode
-             ___                 ___
-             |___|               |___|
-             /    |               |    \
-             /     |               |     \
-             /      |               |      \
-             /       |               |       \
-             ___/       _|_           ___|        \___
-             |___|      |___|         |___|        |___|
-             t->l      last_p          t->m         t->r
+            last_t
+                           __
+                          |  |
+                          |  |
+                        __|  |__
+                        \  TO  /
+                         \    /
+                          \  /
+                           \/
+                         t                 pNode
+                        ___                 ___
+                       |___|               |___|
+                      /    |               |    \
+                     /     |               |     \
+                    /      |               |      \
+                   /       |               |       \
+               ___/       _|_           ___|        \___
+              |___|      |___|         |___|        |___|
+              t->l      last_p          t->m         t->r
              last_t
              */
             //move t's middle to pNode's left
@@ -234,36 +234,36 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
         else if (last_t == t->right)
         {//previous call was on a right
             /*
-             t               pNode
-             ___               ___
-             |___|             |___|
-             /|    \
-             / |     \
-             /  |      \
-             /   |       \
-             ___/  __|   ___  \___
+                        t               pNode
+                       ___               ___
+                      |___|             |___|
+                     /|    \
+                    / |     \
+                   /  |      \
+                  /   |       \
+              ___/  __|   ___  \___
              |___| |___| |___| |___|
              t->l  t->m  last_p t->r
-             last_t
-             __
-             |  |
-             |  |
-             __|  |__
-             \  TO  /
-             \    /
-             \  /
-             \/
-             t                 pNode
-             ___                 ___
-             |___|               |___|
-             /    |               |    \
-             /     |               |     \
-             /      |               |      \
-             /       |               |       \
-             ___/       _|_           ___|        \___
+            last_t
+                               __
+                              |  |
+                              |  |
+                            __|  |__
+                            \  TO  /
+                             \    /
+                              \  /
+                               \/
+                        t                 pNode
+                       ___                 ___
+                      |___|               |___|
+                     /    |               |    \
+                    /     |               |     \
+                   /      |               |      \
+                  /       |               |       \
+              ___/       _|_           ___|        \___
              |___|      |___|         |___|        |___|
              t->l       t->m        last_p         t->r
-             last_t
+            last_t
              */
             //move t's right to pNode's middle
             pNode->middle = t->right;
@@ -275,37 +275,37 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
         else
         {//previous call was on a middle
             /*
-             t               pNode
-             ___               ___
-             |___|             |___|
-             / |  |
-             /  |  |
-             /   |  |
-             /    |  |
-             ___/  ___|  |__   ___
+                        t               pNode
+                       ___               ___
+                      |___|             |___|
+                     / |  |
+                    /  |  |
+                   /   |  |
+                  /    |  |
+              ___/  ___|  |__   ___
              |___| |___| |___| |___|
              t->l  t->m  t->r  last_p
-             last_t
-             __
-             |  |
-             |  |
-             __|  |__
-             \  TO  /
-             \    /
-             \  /
-             \/
+            last_t
+                             __
+                            |  |
+                            |  |
+                          __|  |__
+                          \  TO  /
+                           \    /
+                            \  /
+                             \/
              
-             t                 pNode
-             ___                 ___
-             |___|               |___|
-             /    |               |    \
-             /     |               |     \
-             /      |               |      \
-             /       |               |       \
-             ___/       _|_           ___|        \___
+                        t                 pNode
+                       ___                 ___
+                      |___|               |___|
+                     /    |               |    \
+                    /     |               |     \
+                   /      |               |      \
+                  /       |               |       \
+              ___/       _|_           ___|        \___
              |___|      |___|         |___|        |___|
              t->l       t->m          t->r         last_p
-             last_t
+            last_t
              */
             //move t's right to pNode's left
             pNode->left = t->right;
