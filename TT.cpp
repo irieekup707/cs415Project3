@@ -135,13 +135,31 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
     }
     else if(isLeaf(t))
     {
-        if(t->keyR == "")
+        if (x == t->keyL)
         {
+            t->linesL.push_back(line);
+        }
+        else if (t->keyR == "")
+        {
+            distWord++;
             t->keyR = x;
+            t->linesR.push_back(line);
+            
+            if (t->keyL > t->keyR)
+            {
+                t->keyL.swap(t->keyR);
+                t->linesL.swap(t->linesR);
+            }
+        }
+        else if (x == t->keyR)
+        {
+            t->linesR.push_back(line);
         }
         else
         {
-            pNode = new node("x");
+            distWord++;
+            pNode = new node(x);
+            pNode->linesL.push_back(line);
             promoteHelper(t);
         }
     }
@@ -262,6 +280,7 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
         }
         else if (last_t == t->right)
         {//previous call was on a right
+            //SWAP MIDDLE AND RIGHT CASES
             /*
                         t               pNode
                        ___               ___
@@ -296,6 +315,7 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
              */
             //move t's right to pNode's middle
             pNode->middle = t->right;
+            t->right = NULL;
             pNode->middle->parent = pNode;
             //last_t becomes pNode's left
             pNode->left = last_sib;
@@ -367,16 +387,25 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
     if (!t->parent)
     {//we're splitting the root
         static node newRoot = *pNode;
+        ///SORT CHILDREN OF PNODE
+        root = &newRoot;
+        //DOUBLE CHECK
         newRoot.left = t;
+        t->parent = &newRoot;
         newRoot.middle = sibling;
+        t->parent = &newRoot;
     }
     else if (t->parent->keyR == "")
     {//there's room for simple promotion to existing parent
-        t->keyR = pNode->keyL;
-        t->linesR = pNode->linesL;
+        t->parent->keyR = pNode->keyL;
+        t->parent->linesR = pNode->linesL;
+        
+        t->parent->right = sibling;
+        
         //t == (t->parent)->right NOT POSSIBLE with keyR == ""
-        //regardless, pNode's parent is t's parent
-        pNode->parent = t->parent;
+        //regardless, sibling's parent is t's parent
+        sibling->parent = t->parent;
+        
     }
     else
     {//complicated promotion
