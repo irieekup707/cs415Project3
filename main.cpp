@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     }
 
     ifstream input(argv[1]);
-    BST myTree;
+//    BST myTree;
     TT ttTree;
 
 
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
         ttTree.buildTree(input);
         ttTree.printTree(cout);
         
-        myTree.buildTree(input);
+//        myTree.buildTree(input);
         input.close();
 //        while(1){
 //            choice = 0;

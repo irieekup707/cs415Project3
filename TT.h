@@ -22,6 +22,8 @@ public:
     bool isEmpty();
 
     void printTree(ostream &out = cout) const;
+    
+    void printLevels(ostream &out = cout) const;
 
     void buildTree(ifstream &input);
 
@@ -83,6 +85,8 @@ private:
     bool containsHelper(const string &x, node *t, node *&result) const;
 
     void printTreeHelper(node *t, ostream &out) const;
+    
+    void printLevelsHelper(node *t, ostream &out) const;
     
     void promoteHelper(node* t, node* pNode, node* last_t = NULL, node* last_sib = NULL);
     

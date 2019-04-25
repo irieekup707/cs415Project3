@@ -86,6 +86,8 @@ void TT::buildTree(ifstream & input){
             {
                 //Once word is formatted,call insert with the word, the line of the input
                 //file it came from, the root of our tree, and the distinct word counter
+                cout << "tree height: " << findHeight(root) << endl;
+                printTree();
                 insertHelper(tempWord, line, root, distWords);
                 //Increment our total number of words inserted
                 numWords++;
@@ -213,7 +215,11 @@ bool TT::containsHelper(const string & x, node * t, node * &result) const{
 
 //Called by printTree(), does the actual formatted printing
 void TT::printTreeHelper(node *t, ostream & out) const{
-    if(t->isLeaf())
+    if(t == NULL)
+    {
+        out << "null tree" << endl;
+    }
+    else if(t->isLeaf())
     {
         out << setw(30) << std::left;
         out << t->keyL << " " << t->linesL[0];
@@ -229,7 +235,8 @@ void TT::printTreeHelper(node *t, ostream & out) const{
             out << endl;
         }
     }
-    else {
+    else
+    {
         printTreeHelper(t->left, out);
         out << setw(30) << std::left;
         out << t->keyL << " " << t->linesL[0];
@@ -518,13 +525,17 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
 
 //Returns height of tree. If tree has only one node, height is 1
 int TT::findHeight(node *t){
-    if(t == NULL)
+    if((t == NULL) || (t->isLeaf()))
+    {
         return 0;
+    }
     else{
-        int leftHeight = findHeight(t->left), rightHeight = findHeight(t->right);
-        if(leftHeight > rightHeight)
-            return(leftHeight+1);
-        else
-            return(rightHeight+1);
+        int leftHeight = findHeight(t->left) + 1, middleHeight = findHeight(t->middle) + 1, rightHeight = findHeight(t->right) + 1;
+        assert(leftHeight == middleHeight);
+//        if(t->right)
+//        {
+//            assert(middleHeight == rightHeight);
+//        }
+        return leftHeight;
     }
 }
