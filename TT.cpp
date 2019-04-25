@@ -126,6 +126,7 @@ bool TT::isLeaf(node *t)
 //examined, and distWord is incremented if a new word is created
 //and used by buildTree
 void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
+    assert((t == NULL) || (t->keyR == "") || (t->keyL < t->keyR));
     if(t == NULL)
     {
         t = new node(x, "", NULL, NULL, NULL, NULL);
@@ -134,6 +135,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
     }
     else if(isLeaf(t))
     {
+        assert((t->keyR == "") || (t->keyL < t->keyR));
         if (x == t->keyL)
         {
             t->linesL.push_back(line);
@@ -149,6 +151,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
                 t->keyL.swap(t->keyR);
                 t->linesL.swap(t->linesR);
             }
+            assert(t->keyL < t->keyR);
         }
         else if (x == t->keyR)
         {
@@ -159,11 +162,17 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
             distWord++;
             node* pNode = new node(x);
             pNode->linesL.push_back(line);
+            
+            assert(t->keyL < t->keyR);
+            assert(pNode->keyR == "");
+            
+            assert(pNode->keyR == "");
             promoteHelper(t, pNode);
         }
     }
     else
     {
+        assert((t->keyR == "") || (t->keyL < t->keyR));
         if (x.compare(t->keyL) == 0)
         {
             t->linesL.push_back(line);
@@ -232,6 +241,10 @@ void TT::printTreeHelper(node *t, ostream & out) const{
 void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
 {
     assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
+    assert((t->keyR == "") || (t->keyL < t->keyR));
+    assert(pNode->keyR == "");
+    assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
+    
     
     //make new sibling
     node* sibling = new node();
@@ -250,8 +263,12 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
     (t->keyR).swap(sibling->keyL);
     (t->linesR).swap(sibling->linesL);
     
-    assert(pNode->keyL <= sibling->keyL);
-    assert((t->keyL <= pNode->keyL));
+    assert(pNode->keyL < sibling->keyL);
+    assert(t->keyL < pNode->keyL);
+    assert((t->keyR == "") || (t->keyL < t->keyR));
+    assert(sibling->keyR == "");
+    assert(pNode->keyR == "");
+    assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
     
     if (last_sib)
@@ -301,6 +318,10 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             sibling->middle->parent = sibling;
             
             assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
+            assert((t->keyR == "") || (t->keyL < t->keyR));
+            assert(sibling->keyR == "");
+            assert(pNode->keyR == "");
+            assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
         }
         else if (last_t == t->right)
@@ -346,6 +367,10 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             last_sib->parent = sibling;
             
             assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
+            assert((t->keyR == "") || (t->keyL < t->keyR));
+            assert(sibling->keyR == "");
+            assert(pNode->keyR == "");
+            assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
         }
         else
@@ -391,13 +416,26 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             last_sib->parent = sibling;
             
             assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
+            assert((t->keyR == "") || (t->keyL < t->keyR));
+            assert(sibling->keyR == "");
+            assert(pNode->keyR == "");
+            assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
         }
         //in all cases, t is left with no right child
         t->right = NULL;
+        assert((t->keyR == "") || (t->keyL < t->keyR));
+        assert(sibling->keyR == "");
+        assert(pNode->keyR == "");
+        assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     }
     
-    if (!t->parent)
+    assert((t->keyR == "") || (t->keyL < t->keyR));
+    assert(sibling->keyR == "");
+    assert(pNode->keyR == "");
+    assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
+    
+    if (t->parent == NULL)
     {//we're splitting the root
         node* newRoot = new node(*pNode);
         root = newRoot;
@@ -410,11 +448,31 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
         t->parent = newRoot;
         newRoot->middle = sibling;
         t->parent = newRoot;
+        assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
+        
+        assert((t->keyR == "") || (t->keyL < t->keyR));
+        assert(sibling->keyR == "");
+        assert(pNode->keyR == "");
+        assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     }
     else if (t->parent->keyR == "")
     {//there's room for simple promotion to existing parent
         t->parent->keyR = pNode->keyL;
         t->parent->linesR = pNode->linesL;
+        
+        if(t->parent->keyL > t->parent->keyR)
+        {
+            t->parent->keyL.swap(t->parent->keyR);
+            t->parent->linesL.swap(t->parent->linesR);
+            if ((t->parent->left) && (t->parent->middle) && (t->parent->left->keyL > t->parent->middle->keyL))
+            {
+                t->parent->left->swap(t->parent->middle);
+            }
+            if ((t->parent->middle) && (t->parent->right) && (t->parent->middle->keyL > t->parent->right->keyL))
+            {
+                t->parent->middle->swap(t->parent->right);
+            }
+        }
         
         t->parent->right = sibling;
         
@@ -422,10 +480,21 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
         assert(t != (t->parent)->right);
         //regardless, sibling's parent is t's parent
         sibling->parent = t->parent;
+        assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
+        
+        assert((t->keyR == "") || (t->keyL < t->keyR));
+        assert(sibling->keyR == "");
+        assert(pNode->keyR == "");
+        assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     }
     else
     {//complicated promotion
+        assert((t->keyR == "") || (t->keyL < t->keyR));
+        assert(sibling->keyR == "");
+        assert(pNode->keyR == "");
         assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
+        assert((t == NULL) || (t->parent == NULL) || ((t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR)));
+        
         promoteHelper(t->parent, pNode, t, sibling);
     }
 }
