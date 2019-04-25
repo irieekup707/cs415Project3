@@ -73,7 +73,7 @@ private:
 
     node *root;
     
-    static node* pNode;
+//    static node* pNode;
 
     void insertHelper(const string &X, int line, node *&t, int &distWords);
 
@@ -81,7 +81,7 @@ private:
 
     void printTreeHelper(node *t, ostream &out) const;
     
-    void promoteHelper(node* t, node* last_t = NULL, node* last_sib = NULL);
+    void promoteHelper(node* t, node* pNode, node* last_t = NULL, node* last_sib = NULL);
 
     bool isLeaf(node *t);
     
