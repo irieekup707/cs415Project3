@@ -19,39 +19,41 @@ int main(int argc, char* argv[]) {
     BST myTree;
     TT ttTree;
 
-    ttTree.buildTree(input);
 
     if(input.is_open()){
+        ttTree.buildTree(input);
+        ttTree.printTree(cout);
+        
         myTree.buildTree(input);
         input.close();
-        while(1){
-            choice = 0;
-            cout <<"Options: (1) display index, (2) search, (3) save index, (4) quit\n";
-            cin >> choice;
-
-            //Print index
-            if(choice == 1)
-                myTree.printTree(cout);
-
-                //Search index for a word
-            else if(choice == 2)
-                myTree.contains();
-
-                //Save index
-            else if(choice == 3){
-                string outputFile;
-                cout << "Enter a filename to save your index to (Suggested: <filename>.txt) : ";
-                cin >> outputFile;
-                ofstream output(outputFile.c_str());
-                myTree.printTree(output);
-                output.close();
-                cout << "Saved\n";
-            }
-
-                //Quit
-            else
-                break;
-        }
+//        while(1){
+//            choice = 0;
+//            cout <<"Options: (1) display index, (2) search, (3) save index, (4) quit\n";
+//            cin >> choice;
+//
+//            //Print index
+//            if(choice == 1)
+//                myTree.printTree(cout);
+//
+//                //Search index for a word
+//            else if(choice == 2)
+//                myTree.contains();
+//
+//                //Save index
+//            else if(choice == 3){
+//                string outputFile;
+//                cout << "Enter a filename to save your index to (Suggested: <filename>.txt) : ";
+//                cin >> outputFile;
+//                ofstream output(outputFile.c_str());
+//                myTree.printTree(output);
+//                output.close();
+//                cout << "Saved\n";
+//            }
+//
+//                //Quit
+//            else
+//                break;
+//        }
     }
     else{
         cout << "Invalid File Name. Restart Program.\n";

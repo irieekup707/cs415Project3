@@ -55,7 +55,7 @@ void TT::contains() const{
 //Prints the index to the supplied receiver, either
 //cout or the output file
 void TT::printTree(ostream & out) const {
-    out << "Binary Search Tree Index:\n-------------------------\n";
+    out << "2-3 Tree Index:\n-------------------------\n";
     printTreeHelper(root, out);
 }
 
@@ -116,10 +116,6 @@ void TT::buildTree(ifstream & input){
     
 }
 
-bool TT::isLeaf(node *t)
-{
-    return (t->left == NULL && t->middle == NULL);
-}
 
 //x is the word to insert, line is the line in the text file
 //the word was found at, node is the node of the tree being
@@ -133,7 +129,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         t->linesL.push_back(line);
         distWord++;
     }
-    else if(isLeaf(t))
+    else if(t->isLeaf())
     {
         assert((t->keyR == "") || (t->keyL < t->keyR));
         if (x == t->keyL)
@@ -217,8 +213,22 @@ bool TT::containsHelper(const string & x, node * t, node * &result) const{
 
 //Called by printTree(), does the actual formatted printing
 void TT::printTreeHelper(node *t, ostream & out) const{
-    if(t == NULL)
-        return;
+    if(t->isLeaf())
+    {
+        out << setw(30) << std::left;
+        out << t->keyL << " " << t->linesL[0];
+        for (int i = 1; i < t->linesL.size(); i++)
+            out << ", " << t->linesL[i];
+        out << endl;
+        if(t->keyR != "")
+        {
+            out << setw(30) << std::left;
+            out << t->keyR << " " << t->linesR[0];
+            for (int i = 1; i < t->linesR.size(); i++)
+                out << ", " << t->linesR[i];
+            out << endl;
+        }
+    }
     else {
         printTreeHelper(t->left, out);
         out << setw(30) << std::left;
@@ -226,13 +236,20 @@ void TT::printTreeHelper(node *t, ostream & out) const{
         for (int i = 1; i < t->linesL.size(); i++)
             out << ", " << t->linesL[i];
         out << endl;
-
-        printTreeHelper(t->middle, out);
-        out << setw(30) << std::left;
-        out << t->keyR << " " << t->linesR[0];
-        for (int i = 1; i < t->linesR.size(); i++)
-            out << ", " << t->linesR[i];
-        out << endl;
+        
+        if(t->middle)
+        {
+            printTreeHelper(t->middle, out);
+        }
+        if(t->keyR != "")
+        {
+            out << setw(30) << std::left;
+            out << t->keyR << " " << t->linesR[0];
+            for (int i = 1; i < t->linesR.size(); i++)
+                out << ", " << t->linesR[i];
+            out << endl;
+            
+        }
 
         printTreeHelper(t->right, out);
     }

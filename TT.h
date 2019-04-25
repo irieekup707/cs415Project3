@@ -44,6 +44,11 @@ private:
         vector<int> linesL;
         vector<int> linesR;
         
+        bool isLeaf()
+        {
+            return ((left == NULL) && (middle == NULL) && (right == NULL));
+        }
+        
         void swap(node* R)
         {
             keyL.swap(R->keyL);
@@ -73,8 +78,6 @@ private:
 
     node *root;
     
-//    static node* pNode;
-
     void insertHelper(const string &X, int line, node *&t, int &distWords);
 
     bool containsHelper(const string &x, node *t, node *&result) const;
@@ -82,8 +85,6 @@ private:
     void printTreeHelper(node *t, ostream &out) const;
     
     void promoteHelper(node* t, node* pNode, node* last_t = NULL, node* last_sib = NULL);
-
-    bool isLeaf(node *t);
     
     int findHeight(node *t);
 };
