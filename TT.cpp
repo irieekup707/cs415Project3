@@ -3,10 +3,11 @@
 //
 #include"TT.h"
 #include "time.h"
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
 #include <iomanip>
 #include <sstream>
+#include <assert.h>
 
 using namespace std;
 
@@ -232,12 +233,30 @@ void TT::printTreeHelper(node *t, ostream & out) const{
 
 void TT::promoteHelper(node* t, node* last_t, node* last_sib)
 {
+    
+    //make new sibling
+    node* sibling = new node();
+    
+    if (pNode->keyL < t->keyL)
+    {//less than left, current left is mid-key
+        (t->keyL).swap(pNode->keyL);
+        (t->linesL).swap(pNode->linesL);
+    }
+    else if(pNode->keyL > t->keyR)
+    {//greater than right, current right is mid-key
+        t->keyR.swap(pNode->keyL);
+        t->linesR.swap(pNode->linesL);
+    }
+    //now t->keyL < pNode->keyL < t->keyR
+    (t->keyR).swap(sibling->keyL);
+    (t->linesR).swap(sibling->linesL);
+    
     if (last_sib)
     {//if this is a recursive call
         if (last_t == t->left)
         {//previous call was on a left
             /*
-                        t               pNode
+                        t              sibling
                        ___               ___
                       |___|             |___|
                      /    |\
@@ -256,7 +275,7 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
                          \    /
                           \  /
                            \/
-                         t                 pNode
+                         t                sibling
                         ___                 ___
                        |___|               |___|
                       /    |               |    \
@@ -268,63 +287,20 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
               t->l      last_p          t->m         t->r
              last_t
              */
-            //move t's middle to pNode's left
-            pNode->left = t->middle;
-            pNode->left->parent = pNode;
+            //move t's middle to sibling's left
+            sibling->left = t->middle;
+            sibling->left->parent = sibling;
             //last_p becomes t's new middle
             t->middle = last_sib;
             last_sib->parent = t;
-            //t's right becomes pNode's middle
-            pNode->middle = t->right;
-            pNode->middle->parent = pNode;
+            //t's right becomes sibling's middle
+            sibling->middle = t->right;
+            sibling->middle->parent = sibling;
         }
         else if (last_t == t->right)
         {//previous call was on a right
-            //SWAP MIDDLE AND RIGHT CASES
             /*
-                        t               pNode
-                       ___               ___
-                      |___|             |___|
-                     /|    \
-                    / |     \
-                   /  |      \
-                  /   |       \
-              ___/  __|   ___  \___
-             |___| |___| |___| |___|
-             t->l  t->m  last_p t->r
-            last_t
-                               __
-                              |  |
-                              |  |
-                            __|  |__
-                            \  TO  /
-                             \    /
-                              \  /
-                               \/
-                        t                 pNode
-                       ___                 ___
-                      |___|               |___|
-                     /    |               |    \
-                    /     |               |     \
-                   /      |               |      \
-                  /       |               |       \
-              ___/       _|_           ___|        \___
-             |___|      |___|         |___|        |___|
-             t->l       t->m        last_p         t->r
-            last_t
-             */
-            //move t's right to pNode's middle
-            pNode->middle = t->right;
-            t->right = NULL;
-            pNode->middle->parent = pNode;
-            //last_t becomes pNode's left
-            pNode->left = last_sib;
-            last_sib->parent = pNode;
-        }
-        else
-        {//previous call was on a middle
-            /*
-                        t               pNode
+                        t              sibling
                        ___               ___
                       |___|             |___|
                      / |  |
@@ -344,7 +320,7 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
                             \  /
                              \/
              
-                        t                 pNode
+                        t                sibling
                        ___                 ___
                       |___|               |___|
                      /    |               |    \
@@ -356,40 +332,69 @@ void TT::promoteHelper(node* t, node* last_t, node* last_sib)
              t->l       t->m          t->r         last_p
             last_t
              */
-            //move t's right to pNode's left
-            pNode->left = t->right;
-            pNode->left->parent = pNode;
-            //last_p becomes pNode's middle
-            pNode->middle = last_sib;
-            last_sib->parent = pNode;
-            
+            //move t's right to sibling's left
+            sibling->left = t->right;
+            sibling->left->parent = sibling;
+            //last_p becomes sibling's middle
+            sibling->middle = last_sib;
+            last_sib->parent = sibling;
+        }
+        else
+        {//previous call was on a middle
+             /*
+                        t              sibling
+                       ___               ___
+                      |___|             |___|
+                     / |  |
+                    /  |  |
+                   /   |  |
+                  /    |  |
+              ___/  ___|  |__   ___
+             |___| |___| |___| |___|
+             t->l  t->m  t->r  last_p
+            last_t
+                             __
+                            |  |
+                            |  |
+                          __|  |__
+                          \  TO  /
+                           \    /
+                            \  /
+                             \/
+             
+                        t                sibling
+                       ___                 ___
+                      |___|               |___|
+                     /    |               |    \
+                    /     |               |     \
+                   /      |               |      \
+                  /       |               |       \
+              ___/       _|_           ___|        \___
+             |___|      |___|         |___|        |___|
+             t->l       t->m          t->r         last_p
+            last_t
+             */
+            //move t's right to sibling's left
+            sibling->left = t->right;
+            sibling->left->parent = sibling;
+            //last_p becomes sibling's middle
+            sibling->middle = last_sib;
+            last_sib->parent = sibling;
         }
         //in all cases, t is left with no right child
         t->right = NULL;
     }
-    //make new sibling
-    node* sibling = new node();
-    
-    if (pNode->keyL < t->keyL)
-    {//less than left, current left is mid-key
-        (t->keyL).swap(pNode->keyL);
-        (t->linesL).swap(pNode->linesL);
-    }
-    else if(pNode->keyL > t->keyR)
-    {//greater than right, current right is mid-key
-        t->keyR.swap(pNode->keyL);
-        t->linesR.swap(pNode->linesL);
-    }
-    //now t->keyL < pNode->keyL < t->keyR
-    (t->keyR).swap(sibling->keyL);
-    (t->linesR).swap(sibling->linesL);
     
     if (!t->parent)
     {//we're splitting the root
         static node newRoot = *pNode;
         ///SORT CHILDREN OF PNODE
+        /////////////////
+        /////////////////
         root = &newRoot;
-        //DOUBLE CHECK
+        
+        assert((newRoot.left == NULL) && (newRoot.middle == NULL) && (newRoot.right == NULL));
+        
         newRoot.left = t;
         t->parent = &newRoot;
         newRoot.middle = sibling;
