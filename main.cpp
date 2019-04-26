@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
                 cout << "Enter a filename to save your index to (Suggested: <filename>.txt) : ";
                 cin >> outputFile;
                 ofstream output(outputFile.c_str());
-                myTree.printTree(output);
+                ttTree.printTree(output);
                 output.close();
                 cout << "Saved\n";
             }

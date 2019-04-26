@@ -1,13 +1,7 @@
 //
 // Created by Ryan  Martino on 4/21/19.
 //
-#include"TT.h"
-#include "time.h"
-#include <iostream>
-#include <vector>
-#include <iomanip>
-#include <sstream>
-#include <assert.h>
+
 
 using namespace std;
 
@@ -262,7 +256,7 @@ bool TT::containsHelper(const string & x, node * t, node * &result) const{
     }
     else if (x < t->keyL)
         return containsHelper(x, t->left, result);
-    else if (x > t-> keyR)
+    else if ((t->keyR != "") && (x > t-> keyR))
         return containsHelper(x, t->right, result);
     else
         return containsHelper(x, t->middle, result);
@@ -635,5 +629,17 @@ void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
     assert(Q1.empty() || Q2.empty());
     if (Q1.empty() && Q2.empty()) { return; }
     printLevelsHelper(Q1, Q2, cout);
+}
+
+set<string> getWords() const
+{
+    set<string> words;
+    getWordsHelper(root, words);
+    return words;
+}
+
+void getWordsHelper(node* set<string>) const
+{
+    
 }
 

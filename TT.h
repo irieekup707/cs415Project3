@@ -4,12 +4,22 @@
 
 #ifndef CS415PROJECT3_TT_H
 #define CS415PROJECT3_TT_H
+
 #include<iostream>
-#include <string>
-#include <vector>
+#include <iomanip>
+#include <sstream>
 #include <fstream>
-#include <assert.h>
+
+#include <string>
+
+#include <vector>
+#include <set>
 #include <queue>
+
+#include <assert.h>
+
+#include "TT.h"
+#include "time.h"
 
 
 
@@ -102,5 +112,9 @@ private:
     void promoteHelper(node* t, node* pNode, node* last_t = NULL, node* last_sib = NULL);
     
     int findHeight(node *t);
+    
+    set<string> getWords() const;
+    
+    void getWordsHelper(set<string> words) const;
 };
 #endif //CS415PROJECT3_TT_H
