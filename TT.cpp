@@ -89,6 +89,8 @@ void TT::buildTree(ifstream & input){
 //                cout << "tree height: " << findHeight(root) << endl;
 //                printTree();
 //                cout << "inserting: " << tempWord << endl;
+                printLevels();
+                cout << endl;
                 insertHelper(tempWord, line, root, distWords);
                 //Increment our total number of words inserted
                 numWords++;
@@ -548,8 +550,11 @@ int TT::findHeight(node *t){
 void TT::printLevels(ostream &out) const
 {
     queue<node*> Q1, Q2;
-    Q1.push(root);
-    printLevelsHelper(Q1, Q2, cout);
+    if(root)
+    {
+        Q1.push(root);
+        printLevelsHelper(Q1, Q2, cout);
+    }
 }
 
 void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
