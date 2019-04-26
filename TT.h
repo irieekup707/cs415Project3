@@ -37,6 +37,10 @@ public:
     void printTree(ostream &out = cout) const;
     
     void printLevels(ostream &out = cout) const;
+    
+    set<string> getWords() const;
+    
+    bool find(string word) const;
 
     void buildTree(ifstream &input);
 
@@ -113,8 +117,8 @@ private:
     
     int findHeight(node *t);
     
-    set<string> getWords() const;
+    string findHelper(node* t, string word) const;
     
-    void getWordsHelper(node* t, set<string> words) const;
+    void getWordsHelper(node* t, set<string>& words) const;
 };
 #endif //CS415PROJECT3_TT_H

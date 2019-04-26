@@ -96,8 +96,32 @@ int main(int argc, char* argv[]) {
             else if(choice1 == 'c'){
                 ttTree.buildTreeNoOut(input);
                 myTree.buildTreeNoOut(input);
-                std::cout << "final time TT is : " << ttTree.getFinalTime() << std::endl;
-                std::cout << "final time BST is : " << myTree.getFinalTime() << std::endl;
+                
+                auto words = ttTree.getWords();
+                
+                auto startTime = clock();
+                
+                for (auto word : words)
+                {
+                    ttTree.find(word);
+                }
+                
+                auto finishTime = clock();
+                auto totalTime = (double) (finishTime - startTime)/CLOCKS_PER_SEC;
+                
+                std::cout << "final time TT is : " << totalTime << std::endl;
+                
+                startTime = clock();
+                
+                for (auto word : words)
+                {
+                    ttTree.find(word);
+                }
+                
+                finishTime = clock();
+                totalTime = (double) (finishTime - startTime)/CLOCKS_PER_SEC;
+                
+                std::cout << "final time BST is : " << totalTime << std::endl;
 
             }
                 //Quit

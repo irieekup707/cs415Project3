@@ -639,8 +639,30 @@ set<string> TT::getWords() const
     return words;
 }
 
-void TT::getWordsHelper(node* t, set<string>) const
+void TT::getWordsHelper(node* t, set<string>& words) const
 {
-    
+    if (!t) { return; }
+    assert(t->keyL != "");
+    words.insert(t->keyL);
+    if (t->keyR != "") { words.insert(t->keyR); }
+    getWordsHelper(t->left, words);
+    getWordsHelper(t->middle, words);
+    getWordsHelper(t->right, words);
 }
 
+bool TT::find(string word) const
+{
+    auto found = findHelper(root, word);
+    return found != "";
+}
+
+string TT::findHelper(node* t, string word) const
+{
+    if (!t) { return ""; }
+    if (word == t->keyL) { return word; }
+    if (word == t->keyR) { return word; }
+    auto found = findHelper(t->left, word);
+    if (found == "") { found = findHelper(t->middle, word); }
+    if (found == "") { found = findHelper(t->right, word); }
+    return found;
+}
