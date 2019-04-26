@@ -8,7 +8,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include<assert.h>
+#include <assert.h>
+#include <queue>
 
 
 
@@ -86,7 +87,7 @@ private:
 
     void printTreeHelper(node *t, ostream &out) const;
     
-    void printLevelsHelper(node *t, ostream &out) const;
+    void printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const;
     
     void promoteHelper(node* t, node* pNode, node* last_t = NULL, node* last_sib = NULL);
     

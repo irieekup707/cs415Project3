@@ -86,8 +86,9 @@ void TT::buildTree(ifstream & input){
             {
                 //Once word is formatted,call insert with the word, the line of the input
                 //file it came from, the root of our tree, and the distinct word counter
-                cout << "tree height: " << findHeight(root) << endl;
-                printTree();
+//                cout << "tree height: " << findHeight(root) << endl;
+//                printTree();
+//                cout << "inserting: " << tempWord << endl;
                 insertHelper(tempWord, line, root, distWords);
                 //Increment our total number of words inserted
                 numWords++;
@@ -125,7 +126,6 @@ void TT::buildTree(ifstream & input){
 //and used by buildTree
 void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
     assert((t == NULL) || (t->keyR == "") || (t->keyL < t->keyR));
-    cout << "inserting: " << x << endl;
     if(t == NULL)
     {
         t = new node(x, "", NULL, NULL, NULL, NULL);
@@ -242,7 +242,7 @@ void TT::printTreeHelper(node *t, ostream & out) const{
     }
     else
     {
-        printTreeHelper(t->left, out);
+        if (t->left) { printTreeHelper(t->left, out); }
         out << setw(30) << std::left;
         out << t->keyL << " " << t->linesL[0];
         for (int i = 1; i < t->linesL.size(); i++)
@@ -262,7 +262,8 @@ void TT::printTreeHelper(node *t, ostream & out) const{
             out << endl;
             
         }
-        printTreeHelper(t->right, out);
+        
+        if (t->right) { printTreeHelper(t->right, out); }
     }
 }
 
@@ -487,27 +488,28 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
     {//there's room for simple promotion to existing parent
         t->parent->keyR = pNode->keyL;
         t->parent->linesR = pNode->linesL;
+        t->parent->right = sibling;
+        sibling->parent = t->parent;
         
         if(t->parent->keyL > t->parent->keyR)
         {
             t->parent->keyL.swap(t->parent->keyR);
             t->parent->linesL.swap(t->parent->linesR);
-            if ((t->parent->left) && (t->parent->middle) && (t->parent->left->keyL > t->parent->middle->keyL))
-            {
-                t->parent->left->swap(t->parent->middle);
-            }
-            if ((t->parent->middle) && (t->parent->right) && (t->parent->middle->keyL > t->parent->right->keyL))
-            {
-                t->parent->middle->swap(t->parent->right);
-            }
         }
         
-        t->parent->right = sibling;
+        if ((t->parent->left) && (t->parent->middle) && (t->parent->left->keyL > t->parent->middle->keyL))
+        {
+            t->parent->left->swap(t->parent->middle);
+        }
+        if ((t->parent->middle) && (t->parent->right) && (t->parent->middle->keyL > t->parent->right->keyL))
+        {
+            t->parent->middle->swap(t->parent->right);
+        }
+        
         
         //t == (t->parent)->right NOT POSSIBLE with keyR == ""
         assert(t != (t->parent)->right);
-        //regardless, sibling's parent is t's parent
-        sibling->parent = t->parent;
+        
         assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
         
         assert((t->keyR == "") || (t->keyL < t->keyR));
@@ -532,7 +534,6 @@ int TT::findHeight(node *t){
     if((t == NULL) || (t->isLeaf()))
     {
         return 0;
-        
     }
     else{
         int leftHeight = findHeight(t->left) + 1, middleHeight = findHeight(t->middle) + 1, rightHeight = findHeight(t->right) + 1;
@@ -544,3 +545,28 @@ int TT::findHeight(node *t){
         return leftHeight;
     }
 }
+
+void TT::printLevels(ostream &out) const
+{
+//    queue<node*> Q1, Q2;
+//    Q1.push(root);
+//    printLevelsHelper(Q1, Q2, cout);
+}
+
+void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
+{
+//    if(Q2.empty())
+//    {
+//        assert(!Q1.empty());
+//        while(!Q1.empty())
+//        {
+//            cout << Q1.front()->keyL << "," << Q1.front()->keyR << "|";
+//            Q1.pop()
+//        }
+//    }
+//    else
+//    {
+//
+//    }
+}
+
