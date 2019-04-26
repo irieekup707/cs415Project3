@@ -9,7 +9,8 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    int choice;
+    char choice1;
+    int choice2;
     if (argc != 2) {
         cout << "Incorrect input. Correct format: ./<exectuable.out> <inputtext.txt>\n";
         return 1;
@@ -18,27 +19,65 @@ int main(int argc, char* argv[]) {
     ifstream input(argv[1]);
     BST myTree;
     TT ttTree;
+    std::cout << "options: (a) BST, (b) 2-3 Tree, (c) Compare BST and 2-3 Tree" << std::endl;
+    while(1) {
 
-    ttTree.buildTree(input);
+        choice1 = NULL;
 
-    if(input.is_open()){
-        myTree.buildTree(input);
-        input.close();
-        while(1){
-            choice = 0;
-            cout <<"Options: (1) display index, (2) search, (3) save index, (4) quit\n";
-            cin >> choice;
+        cin >> choice1;
+
+        //Print index
+        if (choice1 == 'a') {
+            myTree.buildTree(input);
+            while (1) {
+                choice2 = 0;
+                cout << "Options: (1) display index, (2) search, (3) save index, (4) quit\n";
+                cin >> choice2;
+
+                //Print index
+                if (choice2 == 1)
+                    myTree.printTree(cout);
+
+                    //Search index for a word
+                else if (choice2 == 2)
+                    myTree.contains();
+
+                    //Save index
+                else if (choice2 == 3) {
+                    string outputFile;
+                    cout << "Enter a filename to save your index to (Suggested: <filename>.txt) : ";
+                    cin >> outputFile;
+                    ofstream output(outputFile.c_str());
+                    myTree.printTree(output);
+                    output.close();
+                    cout << "Saved\n";
+                }
+
+                    //Quit
+                else
+                    break;
+            }
+        }
+
+            //Search index for a word
+        else if (choice1 == 'b')
+        {
+            ttTree.buildTree(input);
+        while (1) {
+            choice2 = 0;
+            cout << "Options: (1) display index, (2) search, (3) save index, (4) quit\n";
+            cin >> choice2;
 
             //Print index
-            if(choice == 1)
-                myTree.printTree(cout);
+            if (choice2 == 1)
+                ttTree.printTree(cout);
 
                 //Search index for a word
-            else if(choice == 2)
-                myTree.contains();
+            else if (choice2 == 2)
+                ttTree.contains();
 
                 //Save index
-            else if(choice == 3){
+            else if (choice2 == 3) {
                 string outputFile;
                 cout << "Enter a filename to save your index to (Suggested: <filename>.txt) : ";
                 cin >> outputFile;
@@ -52,6 +91,26 @@ int main(int argc, char* argv[]) {
             else
                 break;
         }
+    }
+                //Save index
+            else if(choice1 == 'c'){
+                ttTree.buildTreeNoOut(input);
+                myTree.buildTreeNoOut(input);
+                std::cout << "final time TT is : " << ttTree.getFinalTime() << std::endl;
+                std::cout << "final time BST is : " << myTree.getFinalTime() << std::endl;
+
+            }
+                //Quit
+            else
+                break;
+        }
+
+    if(input.is_open()){
+
+
+        input.close();
+
+
     }
     else{
         cout << "Invalid File Name. Restart Program.\n";

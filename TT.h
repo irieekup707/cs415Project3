@@ -8,7 +8,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include<assert.h>
+#include <assert.h>
+#include <queue>
 
 
 
@@ -17,13 +18,23 @@ class TT {
 public:
     TT();
 
+
+
     void contains() const;
 
     bool isEmpty();
 
     void printTree(ostream &out = cout) const;
+    
+    void printLevels(ostream &out = cout) const;
 
     void buildTree(ifstream &input);
+
+    void setFinalTime(double t){finalTime = t;}
+
+    double getFinalTime();
+
+    void buildTreeNoOut(ifstream &input);
 
 private:
     struct node {
@@ -43,6 +54,11 @@ private:
         
         vector<int> linesL;
         vector<int> linesR;
+        
+        bool isLeaf()
+        {
+            return ((left == NULL) && (middle == NULL) && (right == NULL));
+        }
         
         void swap(node* R)
         {
@@ -72,8 +88,8 @@ private:
     };
 
     node *root;
-    
-//    static node* pNode;
+
+    double finalTime{0.0};
 
     void insertHelper(const string &X, int line, node *&t, int &distWords);
 
@@ -81,9 +97,9 @@ private:
 
     void printTreeHelper(node *t, ostream &out) const;
     
+    void printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const;
+    
     void promoteHelper(node* t, node* pNode, node* last_t = NULL, node* last_sib = NULL);
-
-    bool isLeaf(node *t);
     
     int findHeight(node *t);
 };

@@ -55,7 +55,7 @@ void TT::contains() const{
 //Prints the index to the supplied receiver, either
 //cout or the output file
 void TT::printTree(ostream & out) const {
-    out << "Binary Search Tree Index:\n-------------------------\n";
+    out << "2-3 Tree Index:\n-------------------------\n";
     printTreeHelper(root, out);
 }
 
@@ -86,6 +86,11 @@ void TT::buildTree(ifstream & input){
             {
                 //Once word is formatted,call insert with the word, the line of the input
                 //file it came from, the root of our tree, and the distinct word counter
+//                cout << "tree height: " << findHeight(root) << endl;
+//                printTree();
+//                cout << "inserting: " << tempWord << endl;
+                printLevels();
+                cout << endl;
                 insertHelper(tempWord, line, root, distWords);
                 //Increment our total number of words inserted
                 numWords++;
@@ -115,10 +120,54 @@ void TT::buildTree(ifstream & input){
     <<"Height of TT is : " << treeHeight << endl;
     
 }
-
-bool TT::isLeaf(node *t)
+double TT::getFinalTime()
 {
-    return (t->left == NULL && t->middle == NULL);
+    return finalTime;
+}
+
+
+void TT::buildTreeNoOut(ifstream & input){
+    int line = 1, numWords = 0, distWords = 0, treeHeight = 0;
+    stringstream tempWord;
+    double totalTime, finishTime, startTime = clock();
+    while (!input.eof()) {
+        string tempLine, tempWord;
+
+        //Read a whole line of text from the file
+        getline(input, tempLine);
+        for (int i = 0; i < tempLine.length(); i++) {
+            //Insert valid chars into tempWord until a delimiter( newline or space) is found
+            while (tempLine[i] != ' '&& tempLine[i] != '\n' && i < tempLine.length() ) {
+                tempWord.insert(tempWord.end(), tempLine[i]);
+                i++;
+            }
+
+            //Trim any punctuation off end of word. Will leave things like apostrophes
+            //and decimal points
+            while(tempWord.length() > 0 && !isalnum(tempWord[tempWord.length() - 1]))
+                tempWord.resize(tempWord.size() -1);
+
+            if (tempWord.length() > 0)
+            {
+                //Once word is formatted,call insert with the word, the line of the input
+                //file it came from, the root of our tree, and the distinct word counter
+    
+                insertHelper(tempWord, line, root, distWords);
+                //Increment our total number of words inserted
+                numWords++;
+                //Clear out tempWord so we can use it again
+                tempWord.clear();
+            }
+            //levelOrderDump();
+        }
+        line++;
+    }
+    //Do time and height calculation
+    finishTime = clock();
+    totalTime = (double) (finishTime - startTime)/CLOCKS_PER_SEC;
+    setFinalTime((double)totalTime);
+    treeHeight = findHeight(root);
+
 }
 
 //x is the word to insert, line is the line in the text file
@@ -133,7 +182,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         t->linesL.push_back(line);
         distWord++;
     }
-    else if(isLeaf(t))
+    else if(t->isLeaf())
     {
         assert((t->keyR == "") || (t->keyL < t->keyR));
         if (x == t->keyL)
@@ -185,6 +234,10 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         {
             insertHelper(x, line, t->left, distWord);
         }
+        else if(t->keyR == "")
+        {
+            insertHelper(x, line, t->middle, distWord);
+        }
         else if (x > t->keyR)
         {
             insertHelper(x, line, t->right, distWord);
@@ -218,23 +271,49 @@ bool TT::containsHelper(const string & x, node * t, node * &result) const{
 //Called by printTree(), does the actual formatted printing
 void TT::printTreeHelper(node *t, ostream & out) const{
     if(t == NULL)
-        return;
-    else {
-        printTreeHelper(t->left, out);
+    {
+        out << "null tree" << endl;
+    }
+    else if(t->isLeaf())
+    {
         out << setw(30) << std::left;
         out << t->keyL << " " << t->linesL[0];
         for (int i = 1; i < t->linesL.size(); i++)
             out << ", " << t->linesL[i];
         out << endl;
-
-        printTreeHelper(t->middle, out);
+        if(t->keyR != "")
+        {
+            out << setw(30) << std::left;
+            out << t->keyR << " " << t->linesR[0];
+            for (int i = 1; i < t->linesR.size(); i++)
+                out << ", " << t->linesR[i];
+            out << endl;
+        }
+    }
+    else
+    {
+        if (t->left) { printTreeHelper(t->left, out); }
         out << setw(30) << std::left;
-        out << t->keyR << " " << t->linesR[0];
-        for (int i = 1; i < t->linesR.size(); i++)
-            out << ", " << t->linesR[i];
+        out << t->keyL << " " << t->linesL[0];
+        for (int i = 1; i < t->linesL.size(); i++)
+            out << ", " << t->linesL[i];
         out << endl;
-
-        printTreeHelper(t->right, out);
+        
+        if(t->middle)
+        {
+            printTreeHelper(t->middle, out);
+        }
+        if(t->keyR != "")
+        {
+            out << setw(30) << std::left;
+            out << t->keyR << " " << t->linesR[0];
+            for (int i = 1; i < t->linesR.size(); i++)
+                out << ", " << t->linesR[i];
+            out << endl;
+            
+        }
+        
+        if (t->right) { printTreeHelper(t->right, out); }
     }
 }
 
@@ -447,7 +526,7 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
         newRoot->left = t;
         t->parent = newRoot;
         newRoot->middle = sibling;
-        t->parent = newRoot;
+        sibling->parent = newRoot;
         assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
         
         assert((t->keyR == "") || (t->keyL < t->keyR));
@@ -459,27 +538,27 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
     {//there's room for simple promotion to existing parent
         t->parent->keyR = pNode->keyL;
         t->parent->linesR = pNode->linesL;
+        t->parent->right = sibling;
+        sibling->parent = t->parent;
         
         if(t->parent->keyL > t->parent->keyR)
         {
             t->parent->keyL.swap(t->parent->keyR);
             t->parent->linesL.swap(t->parent->linesR);
-            if ((t->parent->left) && (t->parent->middle) && (t->parent->left->keyL > t->parent->middle->keyL))
-            {
-                t->parent->left->swap(t->parent->middle);
-            }
-            if ((t->parent->middle) && (t->parent->right) && (t->parent->middle->keyL > t->parent->right->keyL))
-            {
-                t->parent->middle->swap(t->parent->right);
-            }
         }
         
-        t->parent->right = sibling;
+        if ((t->parent->left) && (t->parent->middle) && (t->parent->left->keyL > t->parent->middle->keyL))
+        {
+            t->parent->left->swap(t->parent->middle);
+        }
+        if ((t->parent->middle) && (t->parent->right) && (t->parent->middle->keyL > t->parent->right->keyL))
+        {
+            t->parent->middle->swap(t->parent->right);
+        }
         
         //t == (t->parent)->right NOT POSSIBLE with keyR == ""
         assert(t != (t->parent)->right);
-        //regardless, sibling's parent is t's parent
-        sibling->parent = t->parent;
+        
         assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
         
         assert((t->keyR == "") || (t->keyL < t->keyR));
@@ -501,13 +580,60 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
 
 //Returns height of tree. If tree has only one node, height is 1
 int TT::findHeight(node *t){
-    if(t == NULL)
+    if((t == NULL) || (t->isLeaf()))
+    {
         return 0;
+    }
     else{
-        int leftHeight = findHeight(t->left), rightHeight = findHeight(t->right);
-        if(leftHeight > rightHeight)
-            return(leftHeight+1);
-        else
-            return(rightHeight+1);
+        int leftHeight = findHeight(t->left) + 1, middleHeight = findHeight(t->middle) + 1, rightHeight = findHeight(t->right) + 1;
+        assert(leftHeight == middleHeight);
+//        if(t->right)
+//        {
+//            assert(middleHeight == rightHeight);
+//        }
+        return leftHeight;
     }
 }
+
+void TT::printLevels(ostream &out) const
+{
+    queue<node*> Q1, Q2;
+    if(root)
+    {
+        Q1.push(root);
+        printLevelsHelper(Q1, Q2, cout);
+    }
+}
+
+void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
+{
+    if(Q2.empty())
+    {
+        assert(!Q1.empty());
+        while(!Q1.empty())
+        {
+            cout << Q1.front()->keyL << "," << Q1.front()->keyR << "|";
+            if (Q1.front()->left) { Q2.push(Q1.front()->left); }
+            if (Q1.front()->middle) { Q2.push(Q1.front()->middle); }
+            if (Q1.front()->right) { Q2.push(Q1.front()->right); }
+            Q1.pop();
+        }
+    }
+    else
+    {
+        assert(!Q2.empty());
+        while(!Q2.empty())
+        {
+            cout << Q2.front()->keyL << "," << Q2.front()->keyR << "|";
+            if (Q2.front()->left) { Q1.push(Q2.front()->left); }
+            if (Q2.front()->middle) { Q1.push(Q2.front()->middle); }
+            if (Q2.front()->right) { Q1.push(Q2.front()->right); }
+            Q2.pop();
+        }
+    }
+    cout << endl;
+    assert(Q1.empty() || Q2.empty());
+    if (Q1.empty() && Q2.empty()) { return; }
+    printLevelsHelper(Q1, Q2, cout);
+}
+

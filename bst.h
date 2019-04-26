@@ -22,6 +22,10 @@ public:
     bool isEmpty();
     void printTree(ostream & out = cout) const;
     void buildTree(ifstream & input);
+    void buildTreeNoOut(ifstream & input);
+    double getFinalTime();
+    void setFinalTime(double t){finalTime = t;}
+
 private:
     struct node{
         node(const string &x, node *l, node *r)
@@ -34,6 +38,7 @@ private:
         vector<int> lines;
     };
     node * root;
+    double long finalTime{0.0};
     void insertHelper(const string &X, int line, node *& t, int &distWords);
     bool containsHelper(const string & x, node * t, node* &result) const;
     void printTreeHelper(node *t, ostream & out) const;
