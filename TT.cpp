@@ -125,6 +125,7 @@ void TT::buildTree(ifstream & input){
 //and used by buildTree
 void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
     assert((t == NULL) || (t->keyR == "") || (t->keyL < t->keyR));
+    cout << "inserting: " << x << endl;
     if(t == NULL)
     {
         t = new node(x, "", NULL, NULL, NULL, NULL);
@@ -182,6 +183,10 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
         else if (x < t->keyL)
         {
             insertHelper(x, line, t->left, distWord);
+        }
+        else if(t->keyR == "")
+        {
+            insertHelper(x, line, t->middle, distWord);
         }
         else if (x > t->keyR)
         {
@@ -257,7 +262,6 @@ void TT::printTreeHelper(node *t, ostream & out) const{
             out << endl;
             
         }
-
         printTreeHelper(t->right, out);
     }
 }
@@ -471,7 +475,7 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
         newRoot->left = t;
         t->parent = newRoot;
         newRoot->middle = sibling;
-        t->parent = newRoot;
+        sibling->parent = newRoot;
         assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
         
         assert((t->keyR == "") || (t->keyL < t->keyR));
