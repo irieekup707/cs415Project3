@@ -22,7 +22,8 @@ int main(int argc, char* argv[]) {
 
     if(input.is_open()){
         ttTree.buildTree(input);
-        ttTree.printTree(cout);
+//        ttTree.printTree(cout);
+        ttTree.printLevels();
         
 //        myTree.buildTree(input);
         input.close();

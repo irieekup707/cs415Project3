@@ -506,7 +506,6 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             t->parent->middle->swap(t->parent->right);
         }
         
-        
         //t == (t->parent)->right NOT POSSIBLE with keyR == ""
         assert(t != (t->parent)->right);
         
@@ -548,25 +547,40 @@ int TT::findHeight(node *t){
 
 void TT::printLevels(ostream &out) const
 {
-//    queue<node*> Q1, Q2;
-//    Q1.push(root);
-//    printLevelsHelper(Q1, Q2, cout);
+    queue<node*> Q1, Q2;
+    Q1.push(root);
+    printLevelsHelper(Q1, Q2, cout);
 }
 
 void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
 {
-//    if(Q2.empty())
-//    {
-//        assert(!Q1.empty());
-//        while(!Q1.empty())
-//        {
-//            cout << Q1.front()->keyL << "," << Q1.front()->keyR << "|";
-//            Q1.pop()
-//        }
-//    }
-//    else
-//    {
-//
-//    }
+    if(Q2.empty())
+    {
+        assert(!Q1.empty());
+        while(!Q1.empty())
+        {
+            cout << Q1.front()->keyL << "," << Q1.front()->keyR << "|";
+            if (Q1.front()->left) { Q2.push(Q1.front()->left); }
+            if (Q1.front()->middle) { Q2.push(Q1.front()->middle); }
+            if (Q1.front()->right) { Q2.push(Q1.front()->right); }
+            Q1.pop();
+        }
+    }
+    else
+    {
+        assert(!Q2.empty());
+        while(!Q2.empty())
+        {
+            cout << Q2.front()->keyL << "," << Q2.front()->keyR << "|";
+            if (Q2.front()->left) { Q1.push(Q2.front()->left); }
+            if (Q2.front()->middle) { Q1.push(Q2.front()->middle); }
+            if (Q2.front()->right) { Q1.push(Q2.front()->right); }
+            Q2.pop();
+        }
+    }
+    cout << endl;
+    assert(Q1.empty() || Q2.empty());
+    if (Q1.empty() && Q2.empty()) { return; }
+    printLevelsHelper(Q1, Q2, cout);
 }
 
