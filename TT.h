@@ -18,6 +18,8 @@ class TT {
 public:
     TT();
 
+
+
     void contains() const;
 
     bool isEmpty();
@@ -27,6 +29,12 @@ public:
     void printLevels(ostream &out = cout) const;
 
     void buildTree(ifstream &input);
+
+    void setFinalTime(double t){finalTime = t;}
+
+    double getFinalTime();
+
+    void buildTreeNoOut(ifstream &input);
 
 private:
     struct node {
@@ -80,7 +88,9 @@ private:
     };
 
     node *root;
-    
+
+    double finalTime{0.0};
+
     void insertHelper(const string &X, int line, node *&t, int &distWords);
 
     bool containsHelper(const string &x, node *t, node *&result) const;

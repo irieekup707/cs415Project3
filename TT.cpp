@@ -120,6 +120,55 @@ void TT::buildTree(ifstream & input){
     
 }
 
+double TT::getFinalTime()
+{
+    return finalTime;
+}
+
+
+void TT::buildTreeNoOut(ifstream & input){
+    int line = 1, numWords = 0, distWords = 0, treeHeight = 0;
+    stringstream tempWord;
+    double totalTime, finishTime, startTime = clock();
+    while (!input.eof()) {
+        string tempLine, tempWord;
+
+        //Read a whole line of text from the file
+        getline(input, tempLine);
+        for (int i = 0; i < tempLine.length(); i++) {
+            //Insert valid chars into tempWord until a delimiter( newline or space) is found
+            while (tempLine[i] != ' '&& tempLine[i] != '\n' && i < tempLine.length() ) {
+                tempWord.insert(tempWord.end(), tempLine[i]);
+                i++;
+            }
+
+            //Trim any punctuation off end of word. Will leave things like apostrophes
+            //and decimal points
+            while(tempWord.length() > 0 && !isalnum(tempWord[tempWord.length() - 1]))
+                tempWord.resize(tempWord.size() -1);
+
+            if (tempWord.length() > 0)
+            {
+                //Once word is formatted,call insert with the word, the line of the input
+                //file it came from, the root of our tree, and the distinct word counter
+    
+                insertHelper(tempWord, line, root, distWords);
+                //Increment our total number of words inserted
+                numWords++;
+                //Clear out tempWord so we can use it again
+                tempWord.clear();
+            }
+            //levelOrderDump();
+        }
+        line++;
+    }
+    //Do time and height calculation
+    finishTime = clock();
+    totalTime = (double) (finishTime - startTime)/CLOCKS_PER_SEC;
+    setFinalTime((double)totalTime);
+    treeHeight = findHeight(root);
+
+}
 
 //x is the word to insert, line is the line in the text file
 //the word was found at, node is the node of the tree being
