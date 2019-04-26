@@ -251,7 +251,7 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
 bool TT::containsHelper(const string & x, node * t, node * &result) const{
     if (t == NULL)
         return false;
-    if ((t->keyL.compare(x) == 0)||(t->keyL.compare(x) == 0)){
+    if ((t->keyL.compare(x) == 0)||(t->keyR.compare(x) == 0)){
         result = t;
         return true;
     }
