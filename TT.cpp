@@ -532,6 +532,7 @@ int TT::findHeight(node *t){
     if((t == NULL) || (t->isLeaf()))
     {
         return 0;
+        
     }
     else{
         int leftHeight = findHeight(t->left) + 1, middleHeight = findHeight(t->middle) + 1, rightHeight = findHeight(t->right) + 1;
