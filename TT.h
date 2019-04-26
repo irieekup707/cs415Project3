@@ -115,6 +115,6 @@ private:
     
     set<string> getWords() const;
     
-    void getWordsHelper(set<string> words) const;
+    void getWordsHelper(node* t, set<string> words) const;
 };
 #endif //CS415PROJECT3_TT_H

@@ -2,6 +2,7 @@
 // Created by Ryan  Martino on 4/21/19.
 //
 
+#include "TT.h"
 
 using namespace std;
 
@@ -631,14 +632,14 @@ void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
     printLevelsHelper(Q1, Q2, cout);
 }
 
-set<string> getWords() const
+set<string> TT::getWords() const
 {
     set<string> words;
     getWordsHelper(root, words);
     return words;
 }
 
-void getWordsHelper(node* set<string>) const
+void TT::getWordsHelper(node* t, set<string>) const
 {
     
 }
