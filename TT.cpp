@@ -97,7 +97,6 @@ void TT::buildTree(ifstream & input){
                 //Clear out tempWord so we can use it again
                 tempWord.clear();
             }
-            
         }
         line++;
     }
@@ -316,8 +315,8 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
                   /       |   \
               ___/  ___   |__  \___
              |___| |___| |___| |___|
-             t->l last_p  t->m  t->r
-            last_t
+             t->l  last   t->m  t->r
+            last_t  sib
                            __
                           |  |
                           |  |
@@ -335,8 +334,8 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
                    /       |               |       \
                ___/       _|_           ___|        \___
               |___|      |___|         |___|        |___|
-              t->l      last_p          t->m         t->r
-             last_t
+              t->l      last            t->m         t->r
+             last_t     sib
              */
             //move t's middle to sibling's left
             sibling->left = t->middle;
@@ -367,8 +366,8 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
                   /    |  |
               ___/  ___|  |__   ___
              |___| |___| |___| |___|
-             t->l  t->m  t->r  last_p
-            last_t
+             t->l  t->m  t->r  last
+                        last_t  sib
                              __
                             |  |
                             |  |
@@ -387,8 +386,8 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
                   /       |               |       \
               ___/       _|_           ___|        \___
              |___|      |___|         |___|        |___|
-             t->l       t->m          t->r         last_p
-            last_t
+             t->l       t->m          t->r         last
+                                     last_t         sib
              */
             //move t's right to sibling's left
             sibling->left = t->right;
@@ -410,14 +409,14 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
                         t              sibling
                        ___               ___
                       |___|             |___|
-                     / |  |
-                    /  |  |
-                   /   |  |
-                  /    |  |
-              ___/  ___|  |__   ___
+                     / |   \
+                    /  |    \
+                   /   |     \
+                  /    |      \
+              ___/  ___|  ___  \___
              |___| |___| |___| |___|
-             t->l  t->m  t->r  last_p
-            last_t
+             t->l  t->m  last  t->r
+                  lsat_t  sib
                              __
                             |  |
                             |  |
@@ -436,15 +435,15 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
                   /       |               |       \
               ___/       _|_           ___|        \___
              |___|      |___|         |___|        |___|
-             t->l       t->m          t->r         last_p
-            last_t
+             t->l       t->m          last         t->r
+                       last_t         sib
              */
-            //move t's right to sibling's left
-            sibling->left = t->right;
-            sibling->left->parent = sibling;
-            //last_p becomes sibling's middle
-            sibling->middle = last_sib;
+            //move last_sib to sibling's left
+            sibling->left = last_sib;
             last_sib->parent = sibling;
+            //t->right becomes sibling's middle
+            sibling->middle = t->right;
+            sibling->left->parent = sibling;
             
             assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
             assert((t->keyR == "") || (t->keyL < t->keyR));
