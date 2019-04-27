@@ -170,7 +170,6 @@ void TT::buildTreeNoOut(ifstream & input){
 //examined, and distWord is incremented if a new word is created
 //and used by buildTree
 void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
-    assert((t == NULL) || (t->keyR == "") || (t->keyL < t->keyR));
     if(t == NULL)
     {
         t = new node(x, "", NULL, NULL, NULL, NULL);
@@ -179,7 +178,6 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
     }
     else if(t->isLeaf())
     {
-        assert((t->keyR == "") || (t->keyL < t->keyR));
         if (x == t->keyL)
         {
             t->linesL.push_back(line);
@@ -195,7 +193,6 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
                 t->keyL.swap(t->keyR);
                 t->linesL.swap(t->linesR);
             }
-            assert(t->keyL < t->keyR);
         }
         else if (x == t->keyR)
         {
@@ -206,17 +203,11 @@ void TT::insertHelper(const string &x, int line, node *& t, int &distWord){
             distWord++;
             node* pNode = new node(x);
             pNode->linesL.push_back(line);
-            
-            assert(t->keyL < t->keyR);
-            assert(pNode->keyR == "");
-            
-            assert(pNode->keyR == "");
             promoteHelper(t, pNode);
         }
     }
     else
     {
-        assert((t->keyR == "") || (t->keyL < t->keyR));
         if (x.compare(t->keyL) == 0)
         {
             t->linesL.push_back(line);
@@ -314,11 +305,11 @@ void TT::printTreeHelper(node *t, ostream & out) const{
 
 void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
 {
-    assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
-    assert((t->keyR == "") || (t->keyL < t->keyR));
-    assert(pNode->keyR == "");
-    assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     
+    if (pNode->keyL == "season")
+    {
+        cout << "";
+    }
     
     //make new sibling
     node* sibling = new node();
@@ -336,13 +327,6 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
     //now t->keyL < pNode->keyL < t->keyR
     (t->keyR).swap(sibling->keyL);
     (t->linesR).swap(sibling->linesL);
-    
-    assert(pNode->keyL < sibling->keyL);
-    assert(t->keyL < pNode->keyL);
-    assert((t->keyR == "") || (t->keyL < t->keyR));
-    assert(sibling->keyR == "");
-    assert(pNode->keyR == "");
-    assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
     
     if (last_sib)
@@ -390,12 +374,6 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             //t's right becomes sibling's middle
             sibling->middle = t->right;
             sibling->middle->parent = sibling;
-            
-            assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
-            assert((t->keyR == "") || (t->keyL < t->keyR));
-            assert(sibling->keyR == "");
-            assert(pNode->keyR == "");
-            assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
         }
         else if (last_t == t->right)
@@ -439,12 +417,6 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             //last_p becomes sibling's middle
             sibling->middle = last_sib;
             last_sib->parent = sibling;
-            
-            assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
-            assert((t->keyR == "") || (t->keyL < t->keyR));
-            assert(sibling->keyR == "");
-            assert(pNode->keyR == "");
-            assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
         }
         else
@@ -488,46 +460,22 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
             //t->right becomes sibling's middle
             sibling->middle = t->right;
             sibling->left->parent = sibling;
-            
-            assert((pNode->left == NULL) && (pNode->middle == NULL) && (pNode->right == NULL));
-            assert((t->keyR == "") || (t->keyL < t->keyR));
-            assert(sibling->keyR == "");
-            assert(pNode->keyR == "");
-            assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
 
         }
         //in all cases, t is left with no right child
         t->right = NULL;
-        assert((t->keyR == "") || (t->keyL < t->keyR));
-        assert(sibling->keyR == "");
-        assert(pNode->keyR == "");
-        assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     }
-    
-    assert((t->keyR == "") || (t->keyL < t->keyR));
-    assert(sibling->keyR == "");
-    assert(pNode->keyR == "");
-    assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     
     if (t->parent == NULL)
     {//we're splitting the root
         node* newRoot = new node(*pNode);
         root = newRoot;
-        
-        assert((newRoot->left == NULL) && (newRoot->middle == NULL) && (newRoot->right == NULL));
         //these should already be sorted
-        assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
         
         newRoot->left = t;
         t->parent = newRoot;
         newRoot->middle = sibling;
         sibling->parent = newRoot;
-        assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
-        
-        assert((t->keyR == "") || (t->keyL < t->keyR));
-        assert(sibling->keyR == "");
-        assert(pNode->keyR == "");
-        assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     }
     else if (t->parent->keyR == "")
     {//there's room for simple promotion to existing parent
@@ -552,22 +500,9 @@ void TT::promoteHelper(node* t, node* pNode, node* last_t, node* last_sib)
         }
         
         //t == (t->parent)->right NOT POSSIBLE with keyR == ""
-        assert(t != (t->parent)->right);
-        
-        assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
-        
-        assert((t->keyR == "") || (t->keyL < t->keyR));
-        assert(sibling->keyR == "");
-        assert(pNode->keyR == "");
-        assert((t == NULL) || (t->parent == NULL) || (t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR));
     }
     else
     {//complicated promotion
-        assert((t->keyR == "") || (t->keyL < t->keyR));
-        assert(sibling->keyR == "");
-        assert(pNode->keyR == "");
-        assert((t->keyL < pNode->keyL) && (pNode->keyL < sibling->keyL));
-        assert((t == NULL) || (t->parent == NULL) || ((t->parent->keyR == "") || (t->parent->keyL < t->parent->keyR)));
         
         promoteHelper(t->parent, pNode, t, sibling);
     }
@@ -581,10 +516,8 @@ int TT::findHeight(node *t){
     }
     else{
         int leftHeight = findHeight(t->left) + 1, middleHeight = findHeight(t->middle) + 1, rightHeight = findHeight(t->right) + 1;
-        assert(leftHeight == middleHeight);
 //        if(t->right)
 //        {
-//            assert(middleHeight == rightHeight);
 //        }
         return leftHeight;
     }
@@ -604,7 +537,6 @@ void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
 {
     if(Q2.empty())
     {
-        assert(!Q1.empty());
         while(!Q1.empty())
         {
             cout << Q1.front()->keyL << "," << Q1.front()->keyR << "|";
@@ -616,7 +548,6 @@ void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
     }
     else
     {
-        assert(!Q2.empty());
         while(!Q2.empty())
         {
             cout << Q2.front()->keyL << "," << Q2.front()->keyR << "|";
@@ -627,7 +558,6 @@ void TT::printLevelsHelper(queue<node*> Q1, queue<node*> Q2, ostream &out) const
         }
     }
     cout << endl;
-    assert(Q1.empty() || Q2.empty());
     if (Q1.empty() && Q2.empty()) { return; }
     printLevelsHelper(Q1, Q2, cout);
 }
@@ -642,7 +572,6 @@ set<string> TT::getWords() const
 void TT::getWordsHelper(node* t, set<string>& words) const
 {
     if (!t) { return; }
-    assert(t->keyL != "");
     words.insert(t->keyL);
     if (t->keyR != "") { words.insert(t->keyR); }
     getWordsHelper(t->left, words);

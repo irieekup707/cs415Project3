@@ -67,6 +67,7 @@ void BST::buildTree(ifstream & input){
             //Trim any punctuation off end of word. Will leave things like apostrophes
             //and decimal points
             while(tempWord.length() > 0 && !isalnum(tempWord[tempWord.length() - 1]))
+                
                 tempWord.resize(tempWord.size() -1);
 
             if (tempWord.length() > 0)

@@ -2,6 +2,12 @@
 //             and turns it into a word index, implemented
 //             through the use of a BST
 
+/*
+ Group:
+    WIll Lucic
+    Ryan Martino
+ */
+
 #include <iostream>
 #include <fstream>
 #include "bst.h"
@@ -17,6 +23,8 @@ int main(int argc, char* argv[]) {
     }
 
     ifstream input(argv[1]);
+    ifstream parse;
+    
     BST myTree;
     TT ttTree;
     std::cout << "options: (a) BST, (b) 2-3 Tree, (c) Compare BST and 2-3 Tree" << std::endl;
@@ -67,11 +75,9 @@ int main(int argc, char* argv[]) {
             choice2 = 0;
             cout << "Options: (1) display index, (2) search, (3) save index, (4) quit\n";
             cin >> choice2;
-
             //Print index
             if (choice2 == 1)
                 ttTree.printTree(cout);
-
                 //Search index for a word
             else if (choice2 == 2)
                 ttTree.contains();
